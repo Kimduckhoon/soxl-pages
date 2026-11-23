@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SOXL 도구 사용방법</title>
+<style>
+  /* 기존 안내 페이지(카카오톡_연결방법.html)와 같은 밝은 한 가지 화면. 휴대폰 화면 목업 + 번호 설명 */
+  :root { --bg:#f4f2ee; --card:#fff; --ink:#1f1e1c; --sub:#6b6862; --line:#dedad2; --acc:#c96442; --ok:#2e7d4f; --hi:#fff3c4;
+          --up:#d2343c; --down:#1d5fcf; --teal:#0f6b5c; --amber:#b9720c; --chip:#eef1f0; color-scheme:light; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.65 "Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
+  main { max-width:880px; margin:0 auto; padding-block:32px 80px; padding-left:max(18px, env(safe-area-inset-left, 0px)); padding-right:max(18px, env(safe-area-inset-right, 0px)); }
+  h1 { font-size:26px; margin:0 0 6px; }
+  h2 { font-size:20px; margin:48px 0 12px; padding-top:20px; border-top:1px solid var(--line); }
+  .lead { color:var(--sub); margin:0 0 20px; }
+  .note { background:#fff; border-left:4px solid var(--acc); padding:12px 16px; border-radius:6px; margin:16px 0; font-size:15px; }
+  .ok { background:#e7f3ea; border:1px solid #b9dcc4; border-radius:8px; padding:12px 16px; margin:16px 0; font-size:15px; }
+  mark { background:var(--hi); padding:0 4px; border-radius:3px; font-weight:700; }
+  code { background:#ebe8e1; padding:1px 6px; border-radius:4px; font-size:14px; word-break:break-all; }
+  .url { display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:10px 0; }
+  .url a { font-weight:700; color:var(--acc); word-break:break-all; flex:1 1 240px; }
+  .url button { border:0; background:var(--acc); color:#fff; font:700 14px "Malgun Gothic",sans-serif; border-radius:8px; padding:8px 14px; cursor:pointer; }
+
+  /* 하루 흐름 */
+  .flow { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+  .flow li { display:grid; grid-template-columns:78px 1fr; gap:12px; align-items:start; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .flow .t { font-weight:700; color:var(--acc); font-variant-numeric:tabular-nums; }
+  .flow small { color:var(--sub); display:block; }
+
+  /* 목업 + 설명 */
+  .demo { display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start; margin:14px 0; }
+  .phone { background:#111; border-radius:30px; padding:10px; box-shadow:0 8px 24px rgba(0,0,0,.15); }
+  .screen { background:#f3f6f5; border-radius:22px; overflow:hidden; font-size:12px; line-height:1.45; color:#121a18; }
+  .addr { background:#e4e8e6; color:#5b6865; font-size:10px; padding:6px 12px; text-align:center; }
+  .sc { padding:10px; display:grid; gap:8px; }
+  .m-card { background:#fff; border:1px solid #dbe3e0; border-radius:9px; padding:9px; position:relative; }
+  .m-h { display:flex; justify-content:space-between; align-items:flex-end; }
+  .m-h b { font-size:14px; } .m-h .px { font-size:16px; font-weight:700; text-align:right; line-height:1.1 }
+  .m-h .px small { display:block; font-size:9px; font-weight:400; color:#5b6865 }
+  .m-vs { display:grid; grid-template-columns:1fr 1fr; gap:6px }
+  .m-vs .k { font-size:9px; color:#5b6865 } .m-vs .v { font-size:14px; font-weight:700 } .m-vs .r { font-size:10px }
+  .m-line { display:flex; gap:6px; align-items:center; background:var(--chip); border-radius:6px; padding:6px; font-size:10.5px }
+  .m-line .what { flex:1 }
+  .tg { font-size:9px; font-weight:700; color:#fff; border-radius:4px; padding:1px 5px } .tg.b { background:var(--up) } .tg.s { background:var(--down) }
+  .m-btn { font-size:9px; border:1px solid #dbe3e0; background:#fff; border-radius:5px; padding:2px 5px; white-space:nowrap }
+  .m-seg { display:grid; grid-template-columns:1fr 1fr; border:1px solid #dbe3e0; border-radius:6px; overflow:hidden; font-weight:700; text-align:center; font-size:11px }
+  .m-seg span { padding:5px } .m-seg .on { background:var(--up); color:#fff } .m-seg .off { color:#5b6865 }
+  .m-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:6px }
+  .m-in { border:1px solid #dbe3e0; border-radius:5px; padding:4px 6px; background:#f3f6f5 } .m-in small { display:block; font-size:8.5px; color:#5b6865 }
+  .m-go { margin-top:6px; background:var(--teal); color:#fff; font-weight:700; text-align:center; border-radius:6px; padding:6px }
+  .m-chart { height:54px; } .m-chart svg { width:100%; height:100% }
+  .up { color:var(--up) } .down { color:var(--down) }
+  .pin { position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--acc); color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px #fff; }
+  .hl { outline:2px solid var(--acc); outline-offset:1px; }
+  .explain { list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+  .explain li { display:grid; grid-template-columns:30px 1fr; gap:10px; }
+  .explain .n { width:26px; height:26px; border-radius:50%; background:var(--acc); color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .explain b { display:block; }
+  .explain p { margin:2px 0 0; font-size:15px; color:var(--sub); }
+
+  .steps { counter-reset:s; list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+  .steps li { counter-increment:s; display:grid; grid-template-columns:30px 1fr; gap:10px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+  .steps li::before { content:counter(s); width:24px; height:24px; border-radius:50%; background:var(--ink); color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .qa { display:grid; gap:10px; }
+  .qa details { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .qa summary { cursor:pointer; font-weight:700; }
+  .qa p { margin:8px 0 0; color:var(--sub); font-size:15px; }
+  .ex { font-size:12px; color:var(--sub); text-align:center; margin-top:6px; }
+  @media (max-width:680px) { .demo { grid-template-columns:1fr; } .phone { max-width:320px; margin:0 auto; } .flow li { grid-template-columns:64px 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>SOXL 도구 사용방법</h1>
+  <p class="lead">휴대폰으로 모의투자를 기록하고, 과거 시뮬레이터로 "그때 시작했다면"을 확인하는 방법입니다. 모두 모의 운영용이며 실제 주문은 하지 않습니다.</p>
+
+  <div class="url"><a href="https://kimduckhoon.github.io/soxl-pages/" id="home">https://kimduckhoon.github.io/soxl-pages/</a><button type="button" id="cp">주소 복사</button></div>
+  <div class="note"><b>처음 한 번만:</b> 크롬에서 위 주소를 연 뒤 오른쪽 위 <mark>⋮</mark> → <mark>홈 화면에 추가</mark>를 누르면 앱처럼 아이콘이 생깁니다. 모의투자 기록이 브라우저별로 따로 저장되므로 <b>앞으로 이 아이콘(크롬)으로만</b>여는 것을 권합니다.</div>
+
+  <h2>하루 흐름</h2>
+  <ol class="flow">
+    <li><span class="t">07:30</span><div>종가 자동 반영<small>미국 장이 끝나면 데이터를 모으고 두 페이지를 새 종가로 다시 만듭니다. 할 일 없음. 주말·미국 휴장일 다음 날은 바뀌지 않습니다.</small></div></li>
+    <li><span class="t">08:50</span><div>카카오톡 · 메일 알림<small>"[SOXL 모의] 날짜 의견" 메시지가 옵니다. "리포트 보기"로 AI 의견과 공식 주문을 읽습니다.</small></div></li>
+    <li><span class="t">아무 때</span><div>모의투자 기록<small>공식을 따를지, AI 의견을 따를지, 내 판단대로 할지 정해서 기록합니다. 실제 종가로 체결됐다고 보고 적습니다.</small></div></li>
+    <li><span class="t">가끔</span><div>성적 비교<small>"내 계좌"와 "공식대로 했다면"의 차이를 봅니다. 내 선택이 공식보다 나았는지가 바로 보입니다.</small></div></li>
+  </ol>
+
+  <h2>모의투자 화면</h2>
+  <div class="demo">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="addr">kimduckhoon.github.io/soxl-pages/paper.html</div>
+        <div class="sc">
+          <div class="m-card" style="background:transparent;border:0;padding:2px 2px 0"><span class="pin">1</span>
+            <div class="m-h"><b>SOXL 모의투자</b><span class="px">$30.88<small><span class="down">-31.83%</span> · 2026-11-20 종가</small></span></div></div>
+          <div class="m-card"><span class="pin">2</span>
+            <div class="m-vs">
+              <div><div class="k">내 계좌</div><div class="v">$70,248</div><div class="r up">+0.35%</div></div>
+              <div><div class="k">공식대로 했다면</div><div class="v">$69,512</div><div class="r down">-0.70%</div></div>
+            </div></div>
+          <div class="m-card"><span class="pin">3</span>
+            <div style="font-weight:700;margin-bottom:5px">11-24 (다음 거래일) 공식 주문</div>
+            <div class="m-line"><span class="tg s">익절</span><span class="what">종가 $31.20 이상이면 323주 매도</span><span class="m-btn">폼에 채우기</span></div>
+            <div class="m-line" style="margin-top:4px"><span class="tg b">매수</span><span class="what">종가 $30.88 이하면 <b>323주</b></span><span class="m-btn hl">폼에 채우기</span></div></div>
+          <div class="m-card"><span class="pin">4</span>
+            <div class="m-seg"><span class="on">매수</span><span class="off">매도</span></div>
+            <div class="m-grid">
+              <div class="m-in"><small>체결일</small>2026-11-24</div><div class="m-in"><small>체결가 ($)</small>30.52</div>
+              <div class="m-in"><small>수량 (주)</small>323 · 최대</div><div class="m-in"><small>근거</small>공식</div>
+            </div>
+            <div class="m-go">기록하기</div></div>
+          <div class="m-card"><span class="pin">5</span>
+            <div class="m-chart"><svg viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M0 30 L40 28 L80 33 L120 24 L160 26 L200 20" fill="none" stroke="#0f6b5c" stroke-width="2"/><path d="M0 30 L40 31 L80 35 L120 30 L160 32 L200 29" fill="none" stroke="#b9720c" stroke-width="1.5"/><path d="M0 30 L40 34 L80 40 L120 38 L160 44 L200 46" fill="none" stroke="#9aa6a3" stroke-width="1.2" stroke-dasharray="4 3"/></svg></div>
+            <div style="font-size:9px;color:#5b6865">보유 현황 · 계좌 추이 · 거래 내역</div></div>
+        </div>
+      </div></div>
+      <p class="ex">숫자는 설명용 예시입니다.</p>
+    </div>
+    <ul class="explain">
+      <li><span class="n">1</span><div><b>최신 종가</b><p>전날보다 오르면 <span class="up">빨강</span>, 내리면 <span class="down">파랑</span>(증권사 앱과 같음). 옆 날짜가 어느 날 종가인지 알려 줍니다.</p></div></li>
+      <li><span class="n">2</span><div><b>내 계좌 vs 공식대로 했다면</b><p>같은 날, 같은 돈($70,000)으로 시작한 두 계좌입니다. 아래 줄에 공식 대비 얼마 앞서거나 뒤처졌는지, "처음에 전부 샀다면"의 수익률도 나옵니다.</p></div></li>
+      <li><span class="n">3</span><div><b>다음 거래일 공식 주문</b><p>떨사오팔 공식이 다음 거래일 종가에 할 주문입니다. <mark>폼에 채우기</mark>를 누르면 아래 주문 칸이 자동으로 채워집니다.</p></div></li>
+      <li><span class="n">4</span><div><b>주문 기록</b><p>매수/매도를 고르고 체결일·체결가·수량·근거를 넣고 <mark>기록하기</mark>. 가진 현금보다 많이 사거나 가진 주식보다 많이 팔면 기록되지 않습니다. <mark>최대</mark>는 살 수 있는(팔 수 있는) 최대 수량을 넣어 줍니다.</p></div></li>
+      <li><span class="n">5</span><div><b>보유 현황 · 계좌 추이 · 거래 내역</b><p>평균단가, 평가손익, 실현손익을 보여 줍니다. 그래프는 <span style="color:var(--teal);font-weight:700">내 계좌</span> / <span style="color:var(--amber);font-weight:700">공식</span> / 회색 점선(처음에 전부 샀다면). 잘못 넣은 거래는 내역에서 <mark>삭제</mark>를 두 번 눌러 지웁니다.</p></div></li>
+    </ul>
+  </div>
+
+  <h2>거래 하나 기록하기</h2>
+  <ol class="steps">
+    <li><div>아침 리포트에서 <b>AI 최종 의견</b>과 <b>기존 공식 주문</b>을 읽습니다.</div></li>
+    <li><div>모의투자를 열고 ③ 공식 주문에서 <mark>폼에 채우기</mark>를 누릅니다. (공식과 다르게 하려면 직접 입력)</div></li>
+    <li><div><b>체결가를 실제 그날 종가로 고칩니다.</b> 공식 주문의 가격은 "이 가격 이하일 때 산다"는 기준일 뿐, 실제 체결은 그날 종가입니다.</div></li>
+    <li><div><b>근거</b>를 고릅니다: 공식 / AI 의견 / 내 판단. 나중에 어떤 선택이 잘 맞았는지 볼 때 씁니다. 메모는 선택.</div></li>
+    <li><div><mark>기록하기</mark>를 누르면 아래 거래 내역과 계좌 금액이 바로 바뀝니다.</div></li>
+  </ol>
+  <div class="note">체결일은 <b>미국 날짜</b>입니다. 한국 시간 화요일 아침에 보는 종가는 미국 월요일 것입니다. 날짜를 바꾸면 그날 종가가 체결가 칸에 자동으로 들어갑니다(종가가 들어와 있는 날만).</div>
+
+  <h2>기록 백업 · 옮기기</h2>
+  <p>거래 기록은 서버가 아니라 <b>지금 쓰는 브라우저 안</b>에 저장됩니다. 카카오톡 안 브라우저와 크롬은 서로 다른 곳이어서 기록이 따로 보입니다.</p>
+  <ol class="steps">
+    <li><div>모의투자 맨 아래쪽 <mark>기록 백업 · 옮기기</mark>를 펼칩니다.</div></li>
+    <li><div><mark>현재 기록 복사</mark> → 카카오톡 "나와의 채팅"에 붙여넣어 보관합니다. (가끔 해 두면 안심)</div></li>
+    <li><div>옮길 곳(다른 브라우저·새 휴대폰)에서 같은 칸에 붙여넣고 <mark>붙여넣은 기록으로 바꾸기</mark>를 두 번 누릅니다. 그곳의 기존 기록은 덮어써집니다.</div></li>
+  </ol>
+  <div class="note">계좌 설정(시작 기준일·시작 금액·수수료율)은 맨 아래 <mark>계좌 설정</mark>에서 바꿉니다. 이미 기록한 거래보다 뒤로 시작일을 옮길 수는 없습니다.</div>
+
+  <h2>과거 시뮬레이터</h2>
+  <div class="demo">
+    <div class="phone"><div class="screen">
+      <div class="addr">kimduckhoon.github.io/soxl-pages/simulator.html</div>
+      <div class="sc">
+        <div class="m-card"><span class="pin">1</span>
+          <div class="m-grid" style="margin:0">
+            <div class="m-in"><small>시작일</small>2024-01-02</div><div class="m-in"><small>종료일</small>2026-11-20</div>
+            <div class="m-in"><small>투자금 (달러)</small>70000</div><div class="m-in"><small>분할 수</small>7</div>
+          </div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><span class="m-btn">올해</span><span class="m-btn hl">최근 1년</span><span class="m-btn">3년</span><span class="m-btn">5년</span><span class="m-btn">전체</span></div></div>
+        <div class="m-card"><span class="pin">2</span>
+          <div class="m-vs"><div><div class="k">최종 자산</div><div class="v">$81,240</div><div class="r up">+16.1%</div></div><div><div class="k">최대 낙폭</div><div class="v">-38.2%</div></div></div></div>
+        <div class="m-card"><span class="pin">3</span>
+          <div class="m-chart"><svg viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M0 35 L30 30 L60 32 L90 22 L120 26 L150 18 L200 24" fill="none" stroke="#2a78d6" stroke-width="2"/><path d="M0 35 L30 25 L60 38 L90 12 L120 30 L150 8 L200 40" fill="none" stroke="#eb6834" stroke-width="1.5"/><line x1="120" y1="0" x2="120" y2="50" stroke="#888" stroke-width=".8"/></svg></div></div>
+        <div class="m-card"><span class="pin">4</span><div style="font-weight:700">특정 날짜에 얼마였나</div><div class="m-in" style="margin-top:4px;background:var(--hi)">2025-04-08 → 총자산 $58,930</div></div>
+      </div>
+    </div></div>
+    <ul class="explain">
+      <li><span class="n">1</span><div><b>조건 넣기</b><p>시작일·종료일·투자금·분할 수·수수료·손절일을 넣거나 <mark>올해 / 최근 1년 …</mark> 버튼으로 기간을 고릅니다. 2010년부터 됩니다. <mark>시트 설정으로 되돌리기</mark>는 원래 값으로 돌립니다.</p></div></li>
+      <li><span class="n">2</span><div><b>결과 요약</b><p>최종 자산과 수익률, 손익(실현·평가), 최대 낙폭(가장 많이 줄었을 때), 낸 수수료, 승률, 평균 현금 비중, SOXL만 들고 있었을 때와의 비교.</p></div></li>
+      <li><span class="n">3</span><div><b>자산 변화 그래프</b><p>파랑 = 떨사오팔, 주황 = 같은 돈으로 SOXL만 계속 들고 있었을 때. <b>손가락으로 그래프를 밀면</b> 그날 금액이 보입니다.</p></div></li>
+      <li><span class="n">4</span><div><b>특정 날짜</b><p>날짜를 고르면 그날의 총자산·현금·주식이 나옵니다. 아래에는 종료일 기준 보유 포트와 전체 매매 내역 표가 있습니다.</p></div></li>
+    </ul>
+  </div>
+
+  <h2>자주 묻는 것</h2>
+  <div class="qa">
+    <details><summary>카카오톡에서 "리포트 보기"를 누르면 404가 떠요</summary><p>리포트가 있는 GitHub 저장소가 비공개라서, 로그인 안 된 브라우저에는 404로 보입니다. 그 화면의 <b>sign in</b>을 눌러 GitHub에 한 번 로그인하면 다음부터 바로 열립니다. 또는 ⋮ → 다른 브라우저로 열기.</p></details>
+    <details><summary>오늘 종가가 아직 안 보여요</summary><p>종가는 한국 시간 화~토 아침 7:30쯤 들어옵니다. 그 전이거나 미국 휴장일이면 전 거래일 종가가 보입니다. 페이지를 새로고침해 보세요.</p></details>
+    <details><summary>모의투자 기록이 사라졌어요</summary><p>다른 브라우저(예: 카카오톡 안 브라우저)로 열었을 가능성이 큽니다. 홈 화면 아이콘(크롬)으로 다시 열어 보세요. 브라우저 데이터를 지웠다면 백업해 둔 글자를 붙여넣어 되살립니다.</p></details>
+    <details><summary>공식 주문의 목표가가 매수가와 같아요</summary><p>현재 시트의 매수·매도 목표율 설정을 그대로 쓰기 때문입니다. 시트 값이 바뀌면 다음 날 아침 페이지에도 반영됩니다.</p></details>
+    <details><summary>다른 사람도 볼 수 있나요?</summary><p>페이지 주소를 아는 사람은 시뮬레이터와 종가를 볼 수 있습니다. 모의투자 거래 기록은 내 휴대폰 브라우저 안에만 있어서 다른 사람에게 보이지 않습니다.</p></details>
+    <details><summary>PC에서 보고 싶어요</summary><p>같은 주소를 PC 브라우저로 열면 됩니다. 인터넷 없이 보려면 <code>F:\CLAUDE\SOXL\시뮬레이터_열기.bat</code>을 더블클릭하세요(과거 시뮬레이터).</p></details>
+  </div>
+
+  <div class="ok"><b>링크 모음</b><br>
+    도구 첫 화면: <a href="https://kimduckhoon.github.io/soxl-pages/">kimduckhoon.github.io/soxl-pages</a><br>
+    모의투자: <a href="https://kimduckhoon.github.io/soxl-pages/paper.html">…/paper.html</a> · 과거 시뮬레이터: <a href="https://kimduckhoon.github.io/soxl-pages/simulator.html">…/simulator.html</a><br>
+    리포트(이슈 목록, GitHub 로그인 필요): <a href="https://github.com/Kimduckhoon/soxl-ai/issues">github.com/Kimduckhoon/soxl-ai/issues</a>
+  </div>
+</main>
+<script>
+  document.getElementById('cp').addEventListener('click', function () {
+    var b = this, t = document.getElementById('home').textContent;
+    var done = function () { b.textContent = '복사됨'; setTimeout(function () { b.textContent = '주소 복사'; }, 1500); };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function () { b.textContent = '길게 눌러 복사하세요'; }); else b.textContent = '길게 눌러 복사하세요';
+  });
+</script>
+</body>
+</html>
