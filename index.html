@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SOXL 떨사오팔 도구</title>
+<style>
+  :root { --bg:#f3f6f5; --surface:#fff; --line:#dbe3e0; --fg:#121a18; --muted:#5b6865; --accent:#0f6b5c; color-scheme:light }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0d1211; --surface:#151c1a; --line:#29332f; --fg:#e7eeeb; --muted:#9aa8a4; --accent:#3cc2a8; color-scheme:dark } }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif }
+  main { max-width:560px; margin:0 auto; padding-block:32px 48px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:12px }
+  h1 { font-size:22px; margin:0 0 4px }
+  p { margin:0; color:var(--muted); font-size:14px }
+  a.card { display:block; text-decoration:none; color:inherit; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px }
+  a.card:hover, a.card:focus-visible { border-color:var(--accent); outline:none }
+  a.card b { display:block; font-size:17px; color:var(--accent); margin-bottom:2px }
+  .foot { font-size:12px; margin-top:8px }
+</style>
+</head>
+<body>
+<main>
+  <h1>SOXL 떨사오팔 도구</h1>
+  <p>매일 아침 미국 장 종가가 들어오면 자동으로 새로 만들어집니다.</p>
+  <a class="card" href="paper.html"><b>모의투자</b>가상 계좌에 매수·매도를 기록하고, 같은 돈으로 공식대로 했을 때와 비교합니다.</a>
+  <a class="card" href="simulator.html"><b>과거 시뮬레이터</b>언제 얼마로 시작했다면 어느 시점에 얼마였는지 과거 종가로 계산합니다.</a>
+  <p class="foot">모의 운영용 계산 도구입니다. 투자 권유가 아니며 과거 결과가 미래 수익을 보장하지 않습니다.</p>
+</main>
+</body>
+</html>

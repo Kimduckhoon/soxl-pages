@@ -1,0 +1,633 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}[hidden]{display:none!important}</style>
+<title>SOXL 모의투자</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* 레이아웃: 증권사 앱처럼 위에서 아래로 — 요약 → 오늘의 공식 주문 → 주문 기록 → 보유/그래프 → 내역 → 설정. 한국식 색: 상승 빨강, 하락 파랑 */
+:root {
+  --bg:#f3f6f5; --surface:#ffffff; --line:#dbe3e0; --fg:#121a18; --muted:#5b6865; --faint:#8a9794;
+  --accent:#0f6b5c; --accent-ink:#ffffff; --amber:#b9720c; --hold:#9aa6a3;
+  --up:#d2343c; --down:#1d5fcf; --warn-bg:#fff5df; --warn-fg:#7a4b00; --chip:#e8efed;
+  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-num:"Space Grotesk","IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0d1211; --surface:#151c1a; --line:#29332f; --fg:#e7eeeb; --muted:#9aa8a4; --faint:#6f7d79;
+  --accent:#3cc2a8; --accent-ink:#06201b; --amber:#e3a744; --hold:#66726f;
+  --up:#ff6b70; --down:#6ea4ff; --warn-bg:#33270f; --warn-fg:#f3cf86; --chip:#1f2926; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0d1211; --surface:#151c1a; --line:#29332f; --fg:#e7eeeb; --muted:#9aa8a4; --faint:#6f7d79;
+  --accent:#3cc2a8; --accent-ink:#06201b; --amber:#e3a744; --hold:#66726f;
+  --up:#ff6b70; --down:#6ea4ff; --warn-bg:#33270f; --warn-fg:#f3cf86; --chip:#1f2926; color-scheme:dark }
+* { box-sizing:border-box }
+body { background:var(--bg); color:var(--fg); font:15px/1.55 var(--f-body) }
+.wrap { max-width:880px; margin:0 auto; padding-block:20px 64px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid; gap:14px }
+.num { font-family:var(--f-num); font-variant-numeric:tabular-nums }
+.up { color:var(--up) } .down { color:var(--down) }
+header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:8px 16px }
+h1 { margin:0; font-size:22px; letter-spacing:-.01em; text-wrap:balance }
+h1 small { font-size:12px; font-weight:500; color:var(--muted); margin-left:6px; padding:2px 7px; border-radius:99px; background:var(--chip); vertical-align:3px }
+.quote { text-align:right }
+.quote .px { font-size:26px; font-weight:700; line-height:1.1 }
+.quote .sub { font-size:12px; color:var(--muted) }
+h2 { margin:0 0 10px; font-size:15px }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; min-width:0 }
+.banner { padding:10px 14px; border-radius:10px; background:var(--warn-bg); color:var(--warn-fg); font-size:13px }
+.vs { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.acct { display:grid; gap:2px; min-width:0 }
+.acct .k { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px }
+.acct .k i { width:10px; height:3px; border-radius:2px; display:inline-block }
+.acct .v { font-size:24px; font-weight:700; line-height:1.2 }
+.acct .r { font-size:13px }
+.acct .d { font-size:12px; color:var(--faint) }
+.gap { margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); font-size:13px; color:var(--muted) }
+.order { display:grid; gap:8px }
+.oline { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; padding:10px 12px; border-radius:9px; background:var(--chip) }
+.oline .what { flex:1 1 220px; min-width:0 }
+.tag { font-size:11px; font-weight:700; padding:2px 7px; border-radius:5px; color:#fff }
+.tag.b { background:var(--up) } .tag.s { background:var(--down) } .tag.n { background:var(--faint) }
+.hint { font-size:12px; color:var(--muted) }
+form { display:grid; gap:12px }
+.row { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px }
+label { display:grid; gap:4px; font-size:12px; color:var(--muted); min-width:0 }
+input, select { width:100%; font:inherit; font-size:15px; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 10px; min-width:0 }
+input:focus-visible, select:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:1px }
+.seg { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); border-radius:9px; overflow:hidden }
+.seg button { border:0; border-radius:0; padding:10px; font-weight:700; background:var(--bg); color:var(--muted) }
+.seg button[aria-pressed="true"].b { background:var(--up); color:#fff }
+.seg button[aria-pressed="true"].s { background:var(--down); color:#fff }
+button { font:inherit; font-size:14px; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--fg); padding:7px 12px }
+button:hover { border-color:var(--accent) }
+button:disabled { opacity:.45; cursor:not-allowed }
+.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700; padding:11px }
+.inline { display:flex; gap:6px; align-items:end }
+.inline input { flex:1 }
+.calc { font-size:13px; color:var(--muted) }
+.msg { font-size:13px; min-height:1.2em } .msg.err { color:var(--up) } .msg.ok { color:var(--accent) }
+.stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px 14px }
+.stats div { display:grid; gap:1px } .stats .k { font-size:12px; color:var(--muted) } .stats .v { font-size:17px; font-weight:700 }
+.legend { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12px; color:var(--muted); margin-bottom:6px }
+.legend i { display:inline-block; width:14px; height:3px; border-radius:2px; vertical-align:middle; margin-right:5px }
+.chart { position:relative } .chart svg { display:block; width:100%; height:auto }
+.chart text { fill:var(--faint); font:11px var(--f-num) }
+.tip { position:absolute; pointer-events:none; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:12px; white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,.14) }
+.empty { padding:22px 8px; text-align:center; color:var(--muted); font-size:13px }
+.tw { overflow-x:auto; border:1px solid var(--line); border-radius:9px }
+table { border-collapse:collapse; width:100%; font-size:13px }
+th, td { padding:8px 10px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap }
+th { color:var(--muted); font-weight:500; background:var(--bg) }
+th:first-child, td:first-child { text-align:left }
+td.memo { text-align:left; white-space:normal; min-width:120px; color:var(--muted) }
+tr:last-child td { border-bottom:0 }
+.del { padding:3px 8px; font-size:12px }
+.del.arm { background:var(--up); color:#fff; border-color:var(--up) }
+details summary { cursor:pointer; font-weight:700; font-size:15px }
+details[open] summary { margin-bottom:12px }
+.two { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px }
+@media (max-width:420px) { .acct .v { font-size:20px } .quote .px { font-size:22px } }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>SOXL 모의투자 <small>가상 계좌</small></h1>
+    <div class="quote"><div class="px num" id="qPx">-</div><div class="sub" id="qSub">-</div></div>
+  </header>
+
+  <div class="banner" id="banner">기록을 불러오는 중입니다…</div>
+
+  <section class="card">
+    <div class="vs">
+      <div class="acct"><span class="k"><i style="background:var(--accent)"></i>내 계좌</span>
+        <span class="v num" id="myTotal">-</span><span class="r num" id="myRet">-</span><span class="d num" id="myDetail">-</span></div>
+      <div class="acct"><span class="k"><i style="background:var(--amber)"></i>공식대로 했다면</span>
+        <span class="v num" id="fTotal">-</span><span class="r num" id="fRet">-</span><span class="d num" id="fDetail">-</span></div>
+    </div>
+    <div class="gap" id="gapLine">-</div>
+  </section>
+
+  <section class="card">
+    <h2 id="orderTitle">다음 거래일 공식 주문</h2>
+    <div class="order" id="orderList"></div>
+    <p class="hint" style="margin:10px 0 0">공식 계좌(같은 날 같은 돈으로 시작)가 다음 거래일 종가에 하게 될 주문입니다. 아침 리포트의 AI 의견과 비교해 보고 직접 정하세요.</p>
+  </section>
+
+  <section class="card">
+    <h2>주문 기록</h2>
+    <form id="tradeForm" novalidate>
+      <div class="seg" role="group" aria-label="매수 또는 매도">
+        <button type="button" class="b" id="sideBuy" aria-pressed="true">매수</button>
+        <button type="button" class="s" id="sideSell" aria-pressed="false">매도</button>
+      </div>
+      <div class="row">
+        <label>체결일 (미국 날짜)<input type="date" id="tDate" required></label>
+        <label>체결가 ($)<input type="number" id="tPrice" step="0.01" min="0.01" inputmode="decimal" required></label>
+        <label>수량 (주)
+          <span class="inline"><input type="number" id="tQty" step="1" min="1" inputmode="numeric" required><button type="button" id="maxBtn">최대</button></span>
+        </label>
+        <label>근거<select id="tTag"><option>공식</option><option>AI 의견</option><option>내 판단</option></select></label>
+      </div>
+      <label>메모 (선택)<input type="text" id="tMemo" maxlength="120" placeholder="예: AI는 보류였지만 공식 따름"></label>
+      <div class="calc num" id="calc">-</div>
+      <button type="submit" class="primary" id="submitBtn">기록하기</button>
+      <div class="msg" id="formMsg" role="status"></div>
+    </form>
+  </section>
+
+  <div class="two">
+    <section class="card">
+      <h2>보유 현황</h2>
+      <div class="stats" id="holdStats"></div>
+    </section>
+    <section class="card">
+      <h2>계좌 추이</h2>
+      <div class="legend"><span><i style="background:var(--accent)"></i>내 계좌</span><span><i style="background:var(--amber)"></i>공식</span><span><i style="background:var(--hold)"></i>처음에 전부 샀다면</span></div>
+      <div class="chart" id="chart"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>거래 내역</h2>
+    <div id="tradeTable"></div>
+  </section>
+
+  <section class="card">
+    <details id="priceBox">
+      <summary>종가 직접 입력</summary>
+      <p class="hint" style="margin:0 0 10px">페이지에 들어 있는 종가는 <span class="num" id="builtTo">-</span>까지입니다. 그 뒤 날짜는 여기서 종가를 넣으면 평가금액과 공식 주문이 이어서 계산됩니다.</p>
+      <form id="priceForm" novalidate>
+        <div class="row">
+          <label>날짜<input type="date" id="pDate" required></label>
+          <label>SOXL 종가 ($)<input type="number" id="pClose" step="0.01" min="0.01" inputmode="decimal" required></label>
+        </div>
+        <button type="submit" id="pBtn">종가 저장</button>
+        <div class="msg" id="pMsg" role="status"></div>
+      </form>
+      <div id="priceList" style="margin-top:10px"></div>
+    </details>
+  </section>
+
+  <section class="card" id="backupCard" hidden>
+    <details id="backupBox">
+      <summary>기록 백업 · 옮기기</summary>
+      <p class="hint" style="margin:0 0 10px">거래 기록은 지금 쓰는 이 브라우저 안에만 저장됩니다. 카카오톡 안 브라우저와 크롬은 서로 다른 곳이라 기록이 따로 보여요. 다른 브라우저나 휴대폰으로 옮기거나 혹시 모를 삭제에 대비하려면 아래 글자를 복사해 두었다가 붙여넣으세요.</p>
+      <label>백업 글자<textarea id="bkText" rows="4" style="width:100%;font:12px/1.4 ui-monospace,monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px"></textarea></label>
+      <div class="inline" style="margin-top:8px;flex-wrap:wrap">
+        <button type="button" id="bkCopy">현재 기록 복사</button>
+        <button type="button" id="bkLoad">붙여넣은 기록으로 바꾸기</button>
+      </div>
+      <div class="msg" id="bkMsg" role="status"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details id="setBox">
+      <summary>계좌 설정</summary>
+      <form id="setForm" novalidate>
+        <div class="row">
+          <label>시작 기준일<input type="date" id="sStart" required></label>
+          <label>시작 금액 ($)<input type="number" id="sCap" step="100" min="100" required></label>
+          <label>수수료율 (%)<input type="number" id="sFee" step="0.01" min="0" max="2" required></label>
+        </div>
+        <p class="hint" style="margin:0">공식 계좌도 같은 기준일 종가, 같은 금액으로 새로 시작합니다. 분할 <span class="num" id="pSplits">-</span>포트, 손절 <span class="num" id="pStop">-</span>거래일은 시트 값을 씁니다.</p>
+        <button type="submit" id="sBtn">설정 저장</button>
+        <div class="msg" id="sMsg" role="status"></div>
+      </form>
+    </details>
+  </section>
+</div>
+
+<script>
+// 떨사오팔 계산 엔진 (engine.py 와 같은 규칙). 브라우저와 node 양쪽에서 쓴다.
+// dates: 'YYYY-MM-DD' 문자열 배열(오름차순), closes: 종가 배열, holidays: Set('YYYY-MM-DD')
+(function (root) {
+  function rounddown2(x) { return Math.floor(x * 100 + 1e-9) / 100; }
+  function sround(x) { var s = x < 0 ? -1 : 1; return s * Math.floor(Math.abs(x) * 100 + 0.5 + 1e-9) / 100; }
+  function iso(d) { return d.toISOString().slice(0, 10); }
+  function workday(dateStr, n, holidays) {
+    var d = new Date(dateStr + 'T00:00:00Z'), left = n;
+    while (left > 0) {
+      d.setUTCDate(d.getUTCDate() + 1);
+      var wd = d.getUTCDay();
+      if (wd !== 0 && wd !== 6 && !holidays.has(iso(d))) left--;
+    }
+    return iso(d);
+  }
+  // p: {capital, splits, stopDays, fee, buyPct, sellPct}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
+  function simulate(dates, closes, holidays, p) {
+    var cash = p.capital, open = [], lots = [], rows = [];
+    var prevI = null, prevJ = 0, prevHeld = 0, cumCost = 0, shares = 0, avg = 0, peak = -Infinity, fees = 0;
+    for (var t = 0; t < dates.length; t++) {
+      var d = dates[t], F = Math.round(closes[t] * 100) / 100, sold = [], proceeds = 0;
+      for (var k = 0; k < open.length; k++) {
+        var lot = open[k];
+        if (lot.buyIdx === t) continue;
+        var reason = d >= lot.stopDate ? '손절' : (F >= lot.target ? '익절' : null);
+        if (reason) {
+          var gross = lot.qty * F, sfee = gross * p.fee;
+          lot.sellIdx = t; lot.sellDate = d; lot.sellPrice = F; lot.result = reason;
+          lot.realized = sround(gross - sfee - (lot.amount + lot.fee));
+          proceeds += gross - sfee; fees += sfee; sold.push(lot);
+        }
+      }
+      var bought = null;
+      if (t > 0 && prevI !== null && F <= prevI && prevHeld < p.splits && prevJ > 0) {
+        var amount = prevJ * F;
+        bought = { buyIdx: t, buyDate: d, price: F, qty: prevJ, amount: amount, fee: amount * p.fee,
+                   stopDate: workday(d, p.stopDays, holidays), target: sround(F * (1 + p.sellPct)),
+                   sellIdx: null, sellDate: null, sellPrice: null, realized: null, result: '보유' };
+        fees += bought.fee;
+      }
+      var soldQty = 0; sold.forEach(function (l) { soldQty += l.qty; });
+      cumCost += (bought ? bought.qty * bought.price : 0) - soldQty * avg;
+      shares += (bought ? bought.qty : 0) - soldQty;
+      avg = shares ? cumCost / shares : 0;
+      cash = sround(cash - (bought ? bought.amount + bought.fee : 0) + proceeds);
+      if (sold.length) open = open.filter(function (l) { return l.sellIdx === null; });
+      if (bought) { lots.push(bought); open.push(bought); }
+      var held = open.length;
+      var H = held === p.splits ? null : cash / (p.splits - held);
+      var I = rounddown2(F * (1 + p.buyPct) - 1e-9);
+      var J = H === null ? 0 : Math.floor(H / I);
+      var total = shares * F + cash;
+      if (total > peak) peak = total;
+      rows.push({ date: d, close: F, held: held, shares: shares, avg: avg, cash: cash, total: total,
+                  dd: total / peak - 1, bought: bought ? bought.qty : 0, sold: soldQty });
+      prevI = I; prevJ = J; prevHeld = held;
+    }
+    return { rows: rows, lots: lots, fees: fees };
+  }
+  var api = { simulate: simulate, workday: workday };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Tteol = api;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+(function () {
+  var D = {"dates":["2024-01-02","2024-01-03","2024-01-04","2024-01-05","2024-01-08","2024-01-09","2024-01-10","2024-01-11","2024-01-12","2024-01-16","2024-01-17","2024-01-18","2024-01-19","2024-01-22","2024-01-23","2024-01-24","2024-01-25","2024-01-26","2024-01-29","2024-01-30","2024-01-31","2024-02-01","2024-02-02","2024-02-05","2024-02-06","2024-02-07","2024-02-08","2024-02-09","2024-02-12","2024-02-13","2024-02-14","2024-02-15","2024-02-16","2024-02-20","2024-02-21","2024-02-22","2024-02-23","2024-02-26","2024-02-27","2024-02-28","2024-02-29","2024-03-01","2024-03-04","2024-03-05","2024-03-06","2024-03-07","2024-03-08","2024-03-11","2024-03-12","2024-03-13","2024-03-14","2024-03-15","2024-03-18","2024-03-19","2024-03-20","2024-03-21","2024-03-22","2024-03-25","2024-03-26","2024-03-27","2024-03-28","2024-04-01","2024-04-02","2024-04-03","2024-04-04","2024-04-05","2024-04-08","2024-04-09","2024-04-10","2024-04-11","2024-04-12","2024-04-15","2024-04-16","2024-04-17","2024-04-18","2024-04-19","2024-04-22","2024-04-23","2024-04-24","2024-04-25","2024-04-26","2024-04-29","2024-04-30","2024-05-01","2024-05-02","2024-05-03","2024-05-06","2024-05-07","2024-05-08","2024-05-09","2024-05-10","2024-05-13","2024-05-14","2024-05-15","2024-05-16","2024-05-17","2024-05-20","2024-05-21","2024-05-22","2024-05-23","2024-05-24","2024-05-28","2024-05-29","2024-05-30","2024-05-31","2024-06-03","2024-06-04","2024-06-05","2024-06-06","2024-06-07","2024-06-10","2024-06-11","2024-06-12","2024-06-13","2024-06-14","2024-06-17","2024-06-18","2024-06-20","2024-06-21","2024-06-24","2024-06-25","2024-06-26","2024-06-27","2024-06-28","2024-07-01","2024-07-02","2024-07-03","2024-07-05","2024-07-08","2024-07-09","2024-07-10","2024-07-11","2024-07-12","2024-07-15","2024-07-16","2024-07-17","2024-07-18","2024-07-19","2024-07-22","2024-07-23","2024-07-24","2024-07-25","2024-07-26","2024-07-29","2024-07-30","2024-07-31","2024-08-01","2024-08-02","2024-08-05","2024-08-06","2024-08-07","2024-08-08","2024-08-09","2024-08-12","2024-08-13","2024-08-14","2024-08-15","2024-08-16","2024-08-19","2024-08-20","2024-08-21","2024-08-22","2024-08-23","2024-08-26","2024-08-27","2024-08-28","2024-08-29","2024-08-30","2024-09-03","2024-09-04","2024-09-05","2024-09-06","2024-09-09","2024-09-10","2024-09-11","2024-09-12","2024-09-13","2024-09-16","2024-09-17","2024-09-18","2024-09-19","2024-09-20","2024-09-23","2024-09-24","2024-09-25","2024-09-26","2024-09-27","2024-09-30","2024-10-01","2024-10-02","2024-10-03","2024-10-04","2024-10-07","2024-10-08","2024-10-09","2024-10-10","2024-10-11","2024-10-14","2024-10-15","2024-10-16","2024-10-17","2024-10-18","2024-10-21","2024-10-22","2024-10-23","2024-10-24","2024-10-25","2024-10-28","2024-10-29","2024-10-30","2024-10-31","2024-11-01","2024-11-04","2024-11-05","2024-11-06","2024-11-07","2024-11-08","2024-11-11","2024-11-12","2024-11-13","2024-11-14","2024-11-15","2024-11-18","2024-11-19","2024-11-20","2024-11-21","2024-11-22","2024-11-25","2024-11-26","2024-11-27","2024-11-29","2024-12-02","2024-12-03","2024-12-04","2024-12-05","2024-12-06","2024-12-09","2024-12-10","2024-12-11","2024-12-12","2024-12-13","2024-12-16","2024-12-17","2024-12-18","2024-12-19","2024-12-20","2024-12-23","2024-12-24","2024-12-26","2024-12-27","2024-12-30","2024-12-31","2025-01-02","2025-01-03","2025-01-06","2025-01-07","2025-01-08","2025-01-10","2025-01-13","2025-01-14","2025-01-15","2025-01-16","2025-01-17","2025-01-21","2025-01-22","2025-01-23","2025-01-24","2025-01-27","2025-01-28","2025-01-29","2025-01-30","2025-01-31","2025-02-03","2025-02-04","2025-02-05","2025-02-06","2025-02-07","2025-02-10","2025-02-11","2025-02-12","2025-02-13","2025-02-14","2025-02-18","2025-02-19","2025-02-20","2025-02-21","2025-02-24","2025-02-25","2025-02-26","2025-02-27","2025-02-28","2025-03-03","2025-03-04","2025-03-05","2025-03-06","2025-03-07","2025-03-10","2025-03-11","2025-03-12","2025-03-13","2025-03-14","2025-03-17","2025-03-18","2025-03-19","2025-03-20","2025-03-21","2025-03-24","2025-03-25","2025-03-26","2025-03-27","2025-03-28","2025-03-31","2025-04-01","2025-04-02","2025-04-03","2025-04-04","2025-04-07","2025-04-08","2025-04-09","2025-04-10","2025-04-11","2025-04-14","2025-04-15","2025-04-16","2025-04-17","2025-04-21","2025-04-22","2025-04-23","2025-04-24","2025-04-25","2025-04-28","2025-04-29","2025-04-30","2025-05-01","2025-05-02","2025-05-05","2025-05-06","2025-05-07","2025-05-08","2025-05-09","2025-05-12","2025-05-13","2025-05-14","2025-05-15","2025-05-16","2025-05-19","2025-05-20","2025-05-21","2025-05-22","2025-05-23","2025-05-27","2025-05-28","2025-05-29","2025-05-30","2025-06-02","2025-06-03","2025-06-04","2025-06-05","2025-06-06","2025-06-09","2025-06-10","2025-06-11","2025-06-12","2025-06-13","2025-06-16","2025-06-17","2025-06-18","2025-06-20","2025-06-23","2025-06-24","2025-06-25","2025-06-26","2025-06-27","2025-06-30","2025-07-01","2025-07-02","2025-07-03","2025-07-07","2025-07-08","2025-07-09","2025-07-10","2025-07-11","2025-07-14","2025-07-15","2025-07-16","2025-07-17","2025-07-18","2025-07-21","2025-07-22","2025-07-23","2025-07-24","2025-07-25","2025-07-28","2025-07-29","2025-07-30","2025-07-31","2025-08-01","2025-08-04","2025-08-05","2025-08-06","2025-08-07","2025-08-08","2025-08-11","2025-08-12","2025-08-13","2025-08-14","2025-08-15","2025-08-18","2025-08-19","2025-08-20","2025-08-21","2025-08-22","2025-08-25","2025-08-26","2025-08-27","2025-08-28","2025-08-29","2025-09-02","2025-09-03","2025-09-04","2025-09-05","2025-09-08","2025-09-09","2025-09-10","2025-09-11","2025-09-12","2025-09-15","2025-09-16","2025-09-17","2025-09-18","2025-09-19","2025-09-22","2025-09-23","2025-09-24","2025-09-25","2025-09-26","2025-09-29","2025-09-30","2025-10-01","2025-10-02","2025-10-03","2025-10-06","2025-10-07","2025-10-08","2025-10-09","2025-10-10","2025-10-13","2025-10-14","2025-10-15","2025-10-16","2025-10-17","2025-10-20","2025-10-21","2025-10-22","2025-10-23","2025-10-24","2025-10-27","2025-10-28","2025-10-29","2025-10-30","2025-10-31","2025-11-03","2025-11-04","2025-11-05","2025-11-06","2025-11-07","2025-11-10","2025-11-11","2025-11-12","2025-11-13","2025-11-14","2025-11-17","2025-11-18","2025-11-19","2025-11-20","2025-11-21","2025-11-24","2025-11-25","2025-11-26","2025-11-28","2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025-12-05","2025-12-08","2025-12-09","2025-12-10","2025-12-11","2025-12-12","2025-12-15","2025-12-16","2025-12-17","2025-12-18","2025-12-19","2025-12-22","2025-12-23","2025-12-24","2025-12-26","2025-12-29","2025-12-30","2025-12-31","2026-01-02","2026-01-05","2026-01-06","2026-01-07","2026-01-08","2026-01-09","2026-01-12","2026-01-13","2026-01-14","2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-09","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-06","2026-04-07","2026-04-08","2026-04-09","2026-04-10","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10","2026-06-11","2026-06-12","2026-06-15","2026-06-16","2026-06-17","2026-06-18","2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21","2026-08-24","2026-08-25","2026-08-26","2026-08-27","2026-08-28","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-14","2026-09-15","2026-09-16","2026-09-17","2026-09-18","2026-09-21","2026-09-22","2026-09-23","2026-09-24","2026-09-25","2026-09-28","2026-09-29","2026-09-30","2026-10-01","2026-10-02","2026-10-05","2026-10-06","2026-10-07","2026-10-08","2026-10-09","2026-10-12","2026-10-13","2026-10-14","2026-10-15","2026-10-16","2026-10-19","2026-10-20","2026-10-21","2026-10-22","2026-10-23","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-11-02","2026-11-03","2026-11-04","2026-11-05","2026-11-06","2026-11-09","2026-11-10","2026-11-11","2026-11-12","2026-11-13","2026-11-16","2026-11-17","2026-11-18","2026-11-19","2026-11-20"],"closes":[28.04,26.25,25.58,25.93,28.43,28.42,28.17,28.46,28.1,29.19,28.43,31.19,34.86,35.26,35.92,37.42,37.12,34.01,35.04,33.53,32.1,32.45,33.65,35.1,33.83,35.36,37.15,39.32,39.15,36.84,39.12,39.11,38.33,36.42,36.14,41.42,40.17,41.21,41.11,39.8,42.84,48.33,49.77,46.84,50.22,55.32,48.95,46.77,49.58,46.08,43.53,42.74,42.54,41.42,43.4,46.31,46.43,45.89,45.03,46.5,46.53,47.99,45.88,46.19,42.37,43.62,44.0,45.39,43.09,45.8,41.51,39.78,40.54,37.06,34.91,30.79,32.07,34.11,35.49,37.41,39.8,40.61,38.18,34.37,36.45,38.97,41.3,40.36,40.41,39.96,41.03,41.27,43.21,47.0,46.26,45.4,48.25,47.98,49.38,48.81,51.44,54.04,50.98,50.0,48.59,48.59,47.59,53.52,52.51,51.87,53.95,54.17,58.72,60.86,60.1,62.67,65.24,60.02,58.2,53.22,55.3,54.78,53.8,55.36,55.36,57.6,60.39,60.81,64.31,64.25,68.59,61.99,63.94,64.14,65.3,51.55,51.66,47.0,52.93,50.53,42.9,39.78,41.92,41.81,37.24,44.39,35.0,29.34,27.89,28.58,26.22,31.46,31.01,31.41,35.28,35.05,39.92,39.73,41.6,40.09,41.73,37.51,40.4,37.37,38.49,36.6,36.19,38.79,30.07,30.3,29.75,25.96,27.43,28.35,32.22,31.81,33.43,32.16,32.16,31.14,35.12,33.55,33.92,35.07,35.74,39.65,37.66,36.68,33.83,34.96,35.21,36.68,36.41,37.46,38.61,37.83,38.67,40.82,34.47,34.46,35.21,35.27,35.09,34.69,33.8,34.29,35.28,35.35,37.98,34.01,30.09,30.83,30.35,31.38,34.12,36.21,35.41,32.77,31.67,29.69,29.6,26.66,27.67,27.85,27.13,28.49,28.49,29.33,28.13,26.98,28.06,30.2,29.73,30.88,29.12,29.61,29.23,27.06,29.12,28.46,30.7,32.51,31.13,27.83,26.3,27.3,29.59,30.48,30.57,29.69,27.94,27.31,27.67,29.82,32.49,31.15,30.18,28.06,27.85,28.12,29.94,29.99,32.49,33.69,35.15,34.92,32.65,25.06,25.37,25.68,27.15,27.02,25.61,26.25,27.7,27.69,26.33,27.35,27.4,27.54,28.47,28.55,29.99,31.47,31.7,28.81,26.76,25.07,26.29,21.75,22.73,20.51,20.65,21.95,19.23,20.88,17.99,17.41,18.3,18.09,19.8,20.79,19.93,20.38,19.93,19.28,21.0,20.55,18.79,17.76,16.03,15.95,15.95,16.26,11.41,8.73,9.15,8.25,12.77,9.63,10.23,10.47,10.6,9.34,9.2,8.71,9.18,10.29,12.0,12.34,12.29,11.86,12.16,12.1,13.29,13.05,12.64,13.28,13.66,14.11,17.13,18.6,18.84,18.47,18.39,18.06,17.97,17.0,16.51,15.73,17.29,17.04,17.2,16.17,16.9,18.3,19.09,18.81,19.18,20.58,21.89,21.64,21.69,20.04,21.9,21.42,21.61,21.21,21.58,23.95,24.58,25.2,25.11,25.11,24.71,26.05,26.43,24.97,26.37,26.65,27.37,27.29,26.5,27.29,27.03,27.32,27.33,27.5,26.32,25.78,25.62,25.6,26.88,27.03,27.61,24.98,24.08,25.0,24.52,23.99,25.0,25.71,25.61,28.0,29.27,29.42,27.37,27.53,26.24,25.8,25.35,27.45,27.3,27.94,28.18,28.53,26.04,25.25,24.91,25.65,26.45,27.08,27.18,28.6,29.17,29.3,30.0,30.48,30.47,33.64,33.02,34.43,34.3,34.2,33.85,34.02,34.02,34.84,36.86,39.08,38.23,41.71,38.83,42.78,42.24,34.21,39.14,36.63,39.98,40.57,40.29,42.24,41.51,38.39,41.17,43.14,46.84,46.96,49.38,47.39,47.78,48.58,42.8,46.83,43.01,41.74,44.96,41.81,43.71,39.22,38.86,36.84,34.35,35.96,30.81,31.73,35.86,36.17,39.19,41.26,41.31,43.8,46.58,45.16,46.5,47.99,47.79,49.65,48.79,41.71,41.18,40.49,36.01,38.58,41.72,43.26,43.7,44.21,44.21,43.82,43.67,42.03,47.24,49.22,54.01,52.29,49.65,53.95,54.65,56.07,55.38,58.08,60.75,57.94,63.48,63.72,61.6,60.7,64.96,70.09,70.47,61.79,65.2,61.2,53.19,53.25,61.75,64.03,63.34,68.05,63.1,64.59,64.35,66.29,65.23,67.11,65.86,68.53,71.86,65.34,62.77,62.76,53.42,56.62,54.8,47.89,53.32,54.59,56.09,50.28,50.72,53.69,54.95,54.02,54.85,51.14,53.03,54.96,57.04,48.97,46.61,40.62,47.91,52.26,52.75,54.81,56.55,67.5,71.98,76.39,80.56,85.31,85.96,88.37,94.68,95.94,98.09,105.64,112.77,128.32,123.39,109.56,117.97,126.98,130.4,127.55,144.16,165.85,152.1,176.94,190.42,172.52,184.24,186.19,164.18,151.75,151.89,173.2,178.39,190.56,225.79,217.98,224.63,224.34,227.03,266.32,280.54,262.7,182.54,211.44,201.68,180.65,223.99,234.68,272.5,226.19,233.86,279.29,300.77,231.42,229.57,252.61,215.6,236.52,266.71,217.55,181.47,194.65,165.28,174.82,192.45,192.26,165.37,176.66,165.55,142.48,135.47,136.81,158.54,160.99,157.5,136.81,128.15,109.54,91.99,114.72,114.72,116.71,139.9,132.07,132.33,140.25,130.0,133.0,142.16,145.36,144.95,151.53,129.1,120.74,122.21,120.6,111.16,115.67,116.6,123.05,111.34,112.79,105.91,106.35,106.74,117.28,123.27,125.87,115.76,121.82,101.13,102.32,103.97,114.82,123.67,141.93,151.95,146.25,146.33,151.45,142.29,147.0,147.86,153.69,163.71,164.27,164.26,158.91,142.52,139.76,128.4,127.57,110.54,107.35,93.67,98.65,97.55,103.24,82.11,83.56,90.5,101.08,107.35,102.39,77.05,68.17,73.12,66.68,40.87,45.97,56.2,56.06,66.03,65.53,58.32,48.76,49.07,49.26,45.3,30.88],"holidays":["2010-01-01","2010-01-18","2010-02-15","2010-04-02","2010-05-31","2010-07-05","2010-09-06","2010-11-25","2010-12-24","2011-01-17","2011-02-21","2011-04-22","2011-05-30","2011-07-04","2011-09-05","2011-11-24","2011-12-26","2012-01-02","2012-01-16","2012-02-20","2012-04-06","2012-05-28","2012-07-04","2012-09-03","2012-10-29","2012-10-30","2012-11-22","2012-12-25","2013-01-01","2013-01-21","2013-02-18","2013-03-29","2013-05-27","2013-07-04","2013-09-02","2013-11-28","2013-12-25","2014-01-01","2014-01-20","2014-02-17","2014-04-18","2014-05-26","2014-07-04","2014-09-01","2014-11-27","2014-12-25","2015-01-01","2015-01-19","2015-02-16","2015-04-03","2015-05-25","2015-07-03","2015-09-07","2015-11-26","2015-12-25","2016-01-01","2016-01-18","2016-02-15","2016-03-25","2016-05-30","2016-07-04","2016-09-05","2016-11-24","2016-12-26","2017-01-02","2017-01-16","2017-02-20","2017-04-14","2017-05-29","2017-07-04","2017-09-04","2017-11-23","2017-11-25","2017-12-25","2018-01-01","2018-01-15","2018-02-19","2018-03-30","2018-05-28","2018-07-04","2018-09-03","2018-11-22","2018-12-05","2018-12-25","2019-01-01","2019-01-21","2019-02-18","2019-04-19","2019-05-27","2019-07-04","2019-09-02","2019-11-28","2019-12-25","2020-01-01","2020-01-20","2020-02-17","2020-04-10","2020-05-25","2020-07-03","2020-09-07","2020-11-26","2020-12-25","2021-01-01","2021-01-18","2021-02-15","2021-04-02","2021-05-31","2021-07-05","2021-09-06","2021-11-25","2021-12-24","2022-01-17","2022-02-21","2022-04-15","2022-05-30","2022-06-20","2022-07-04","2022-09-05","2022-11-24","2022-12-26","2023-01-02","2023-01-16","2023-02-20","2023-04-07","2023-05-29","2023-06-19","2023-07-04","2023-09-04","2023-11-23","2023-12-25","2024-01-01","2024-01-15","2024-02-19","2024-03-29","2024-05-27","2024-06-19","2024-07-04","2024-09-02","2024-11-28","2024-12-25","2025-01-01","2025-01-09","2025-01-20","2025-02-17","2025-04-18","2025-05-26","2025-06-19","2025-07-04","2025-09-01","2025-11-27","2025-12-25","2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25","2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31","2027-06-18","2027-09-06","2027-11-25","2027-12-24"],"built":"2026-11-23","params":{"capital":70000.0,"splits":7,"stop_days":30,"fee":0.001,"buy_pct":0.0,"sell_pct":0.0},"local":true};
+  var P = D.params, HOL = new Set(D.holidays), E = window.Tteol;
+  var state = { cfg: null, trades: [], prices: {}, db: null, canWrite: false, side: 'buy' };
+  var $ = function (id) { return document.getElementById(id); };
+  var usd = function (x, d) { return (x < 0 ? '-$' : '$') + Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); };
+  var pct = function (x) { return (x > 0 ? '+' : '') + (x * 100).toFixed(2) + '%'; };
+  var cls = function (x) { return x > 0.00001 ? 'up' : (x < -0.00001 ? 'down' : ''); };
+  var rd2 = function (x) { return Math.floor(x * 100 + 1e-9) / 100; };
+
+  function cfg() {
+    var c = state.cfg || {};
+    return { start: c.start || D.dates[D.dates.length - 1], capital: +c.capital || P.capital, fee: c.fee != null ? +c.fee : P.fee };
+  }
+  function priceMap() {
+    var m = {}; D.dates.forEach(function (d, i) { m[d] = D.closes[i]; });
+    Object.keys(state.prices).forEach(function (d) { m[d] = state.prices[d]; });
+    return m;
+  }
+  function nyToday() {
+    var p = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    return p.slice(0, 10);
+  }
+  function isTradingDay(d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(); return w !== 0 && w !== 6 && !HOL.has(d); }
+  function lastTradingOnOrBefore(d) {
+    var x = new Date(d + 'T00:00:00Z');
+    for (var i = 0; i < 10 && !isTradingDay(x.toISOString().slice(0, 10)); i++) x.setUTCDate(x.getUTCDate() - 1);
+    return x.toISOString().slice(0, 10);
+  }
+  function sortedTrades(list) {
+    return list.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.createdAt || 0) - (b.createdAt || 0); });
+  }
+  // 내 계좌 재생: 평균단가(수수료 포함) 방식. 문제가 있으면 err 를 돌려준다.
+  function replay(list, c, upto) {
+    var s = { cash: c.capital, sh: 0, cost: 0, realized: 0, fees: 0, err: null };
+    sortedTrades(list).forEach(function (t) {
+      if (s.err || (upto && t.date > upto)) return;
+      var amt = t.price * t.qty, f = amt * c.fee;
+      if (t.side === 'buy') {
+        s.cash -= amt + f; s.sh += t.qty; s.cost += amt + f;
+        if (s.cash < -0.005) s.err = t.date + ' 매수 후 현금이 ' + usd(s.cash) + '가 됩니다.';
+      } else {
+        if (t.qty > s.sh) { s.err = t.date + ' 매도 수량(' + t.qty + '주)이 그때 보유(' + s.sh + '주)보다 많습니다.'; return; }
+        var avg = s.cost / s.sh; s.cash += amt - f; s.realized += amt - f - avg * t.qty; s.cost -= avg * t.qty; s.sh -= t.qty;
+        if (s.sh === 0) s.cost = 0;
+      }
+      s.fees += f;
+    });
+    return s;
+  }
+
+  function compute() {
+    var c = cfg(), m = priceMap();
+    var all = Object.keys(m).sort();
+    var dates = all.filter(function (d) { return d >= c.start; });
+    if (!dates.length) { dates = [all[all.length - 1]]; }
+    var closes = dates.map(function (d) { return m[d]; });
+    var sim = E.simulate(dates, closes, HOL, { capital: c.capital, splits: P.splits, stopDays: P.stop_days, fee: c.fee, buyPct: P.buy_pct, sellPct: P.sell_pct });
+    var last = dates[dates.length - 1], L = closes[closes.length - 1];
+    var prevIdx = all.indexOf(last) - 1, prevClose = prevIdx >= 0 ? m[all[prevIdx]] : null;
+    var startClose = closes[0], holdSh = Math.floor(c.capital / (startClose * (1 + c.fee)));
+    var holdCash = c.capital - holdSh * startClose * (1 + c.fee);
+    var eq = dates.map(function (d, i) {
+      var s = replay(state.trades, c, d);
+      return { date: d, mine: s.cash + s.sh * closes[i], formula: sim.rows[i].total, hold: holdCash + holdSh * closes[i] };
+    });
+    return { c: c, m: m, dates: dates, closes: closes, sim: sim, last: last, L: L, prevClose: prevClose, eq: eq, now: replay(state.trades, c), hold: holdCash + holdSh * L };
+  }
+
+  function render() {
+    var R = compute(), c = R.c;
+    // 시세
+    $('qPx').textContent = '$' + R.L.toFixed(2);
+    var ch = R.prevClose ? R.L / R.prevClose - 1 : 0;
+    $('qSub').innerHTML = '<span class="' + cls(ch) + '">' + (R.prevClose ? pct(ch) : '') + '</span> · ' + R.last + ' 종가';
+    // 계좌 비교
+    var s = R.now, myT = s.cash + s.sh * R.L, fr = R.sim.rows[R.sim.rows.length - 1];
+    var myR = myT / c.capital - 1, fR = fr.total / c.capital - 1, hR = R.hold / c.capital - 1;
+    $('myTotal').textContent = usd(myT);
+    $('myRet').innerHTML = '<span class="' + cls(myR) + '">' + pct(myR) + ' (' + usd(myT - c.capital) + ')</span>';
+    $('myDetail').textContent = '현금 ' + usd(s.cash, 0) + ' · ' + s.sh + '주';
+    $('fTotal').textContent = usd(fr.total);
+    $('fRet').innerHTML = '<span class="' + cls(fR) + '">' + pct(fR) + ' (' + usd(fr.total - c.capital) + ')</span>';
+    $('fDetail').textContent = '현금 ' + usd(fr.cash, 0) + ' · ' + fr.shares + '주 · ' + fr.held + '/' + P.splits + '포트';
+    var diff = myT - fr.total;
+    $('gapLine').innerHTML = c.start + ' 종가 기준 ' + usd(c.capital, 0) + '로 시작 · 공식 대비 <b class="num ' + cls(diff) + '">' + (diff >= 0 ? '+' : '') + usd(diff) + '</b>' +
+      ' · 처음에 전부 샀다면 <span class="num ' + cls(hR) + '">' + pct(hR) + '</span>';
+    renderOrder(R);
+    renderHold(R);
+    renderChart(R.eq);
+    renderTrades();
+    renderPrices();
+    updateCalc();
+    $('builtTo').textContent = D.dates[D.dates.length - 1];
+  }
+
+  function renderOrder(R) {
+    var c = R.c, fr = R.sim.rows[R.sim.rows.length - 1], next = E.workday(R.last, 1, HOL), out = [];
+    $('orderTitle').textContent = next + ' (다음 거래일) 공식 주문';
+    var open = R.sim.lots.filter(function (l) { return l.sellIdx === null; });
+    open.forEach(function (l) {
+      var stop = next >= l.stopDate;
+      out.push(line('s', stop ? '손절' : '익절',
+        stop ? l.qty + '주 종가에 무조건 매도 <span class="hint">(' + l.buyDate + ' 매수분 손절일)</span>'
+             : '종가가 <b class="num">$' + l.target.toFixed(2) + '</b> 이상이면 ' + l.qty + '주 매도 <span class="hint">(' + l.buyDate + ' 매수분, 손절일 ' + l.stopDate + ')</span>',
+        { side: 'sell', date: next, price: stop ? '' : l.target, qty: l.qty }));
+    });
+    if (fr.held < P.splits) {
+      var I = rd2(R.L * (1 + P.buy_pct) - 1e-9), H = fr.cash / (P.splits - fr.held), J = Math.floor(H / I);
+      out.push(J > 0 ? line('b', '매수', '종가가 <b class="num">$' + I.toFixed(2) + '</b> 이하이면 <b class="num">' + J + '주</b> 매수 <span class="hint">(1회 매수금 ' + usd(H, 0) + ')</span>',
+                            { side: 'buy', date: next, price: I, qty: J })
+                     : line('n', '매수', '현금이 부족해 매수 주문이 없습니다.'));
+    } else out.push(line('n', '매수', P.splits + '포트가 모두 차서 매수 주문이 없습니다.'));
+    var box = $('orderList'); box.innerHTML = '';
+    out.forEach(function (el) { box.appendChild(el); });
+  }
+  function line(kind, label, html, fill) {
+    var d = document.createElement('div'); d.className = 'oline';
+    d.innerHTML = '<span class="tag ' + kind + '">' + label + '</span><span class="what">' + html + '</span>';
+    if (fill) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = '폼에 채우기';
+      b.onclick = function () {
+        setSide(fill.side); $('tDate').value = fill.date; $('tPrice').value = fill.price; $('tQty').value = fill.qty; $('tTag').value = '공식';
+        $('formMsg').textContent = '체결가는 실제 종가로 고쳐서 기록하세요.'; $('formMsg').className = 'msg';
+        updateCalc(); $('tradeForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      d.appendChild(b);
+    }
+    return d;
+  }
+
+  function renderHold(R) {
+    var s = R.now, val = s.sh * R.L, avg = s.sh ? s.cost / s.sh : 0, un = val - s.cost;
+    var items = [['보유 수량', s.sh + '주', ''], ['평균단가', s.sh ? '$' + avg.toFixed(2) : '-', ''], ['평가금액', usd(val), ''],
+      ['평가손익', s.sh ? usd(un) : '-', cls(un)], ['실현손익', usd(s.realized), cls(s.realized)], ['낸 수수료', usd(s.fees), '']];
+    $('holdStats').innerHTML = items.map(function (x) { return '<div><span class="k">' + x[0] + '</span><span class="v num ' + x[2] + '">' + x[1] + '</span></div>'; }).join('');
+  }
+
+  function renderChart(eq) {
+    var box = $('chart');
+    if (eq.length < 2) { box.innerHTML = '<div class="empty">시작 기준일 뒤로 종가가 하루 이상 쌓이면 그래프가 그려집니다.</div>'; return; }
+    var W = 560, Hh = 230, l = 52, r = 10, t = 10, b = 24, keys = ['hold', 'formula', 'mine'], col = { mine: 'var(--accent)', formula: 'var(--amber)', hold: 'var(--hold)' };
+    var lo = Infinity, hi = -Infinity;
+    eq.forEach(function (p) { keys.forEach(function (k) { lo = Math.min(lo, p[k]); hi = Math.max(hi, p[k]); }); });
+    var pad = (hi - lo) * 0.08 || hi * 0.02; lo -= pad; hi += pad;
+    var X = function (i) { return l + (W - l - r) * i / (eq.length - 1); }, Y = function (v) { return t + (Hh - t - b) * (1 - (v - lo) / (hi - lo)); };
+    var g = '';
+    for (var k = 0; k <= 3; k++) {
+      var v = lo + (hi - lo) * k / 3, y = Y(v);
+      g += '<line x1="' + l + '" x2="' + (W - r) + '" y1="' + y + '" y2="' + y + '" stroke="var(--line)" stroke-width="1"/>' +
+           '<text x="' + (l - 6) + '" y="' + (y + 4) + '" text-anchor="end">$' + Math.round(v / 1000) + 'k</text>';
+    }
+    g += '<text x="' + l + '" y="' + (Hh - 6) + '">' + eq[0].date + '</text><text x="' + (W - r) + '" y="' + (Hh - 6) + '" text-anchor="end">' + eq[eq.length - 1].date + '</text>';
+    keys.forEach(function (k) {
+      var d = eq.map(function (p, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p[k]).toFixed(1); }).join('');
+      g += '<path d="' + d + '" fill="none" stroke="' + col[k] + '" stroke-width="' + (k === 'mine' ? 2.4 : 1.6) + '"' + (k === 'hold' ? ' stroke-dasharray="4 3"' : '') + ' stroke-linejoin="round"/>';
+      var lp = eq[eq.length - 1];
+      g += '<circle cx="' + X(eq.length - 1) + '" cy="' + Y(lp[k]) + '" r="3" fill="' + col[k] + '"/>';
+    });
+    g += '<line id="cx" y1="' + t + '" y2="' + (Hh - b) + '" stroke="var(--faint)" stroke-width="1" visibility="hidden"/>';
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" role="img" aria-label="계좌 평가금액 추이">' + g + '</svg><div class="tip" hidden></div>';
+    var svg = box.querySelector('svg'), tip = box.querySelector('.tip'), cx = svg.querySelector('#cx');
+    function move(ev) {
+      var rc = svg.getBoundingClientRect(), x = (ev.clientX - rc.left) * W / rc.width;
+      var i = Math.max(0, Math.min(eq.length - 1, Math.round((x - l) / (W - l - r) * (eq.length - 1)))), p = eq[i];
+      cx.setAttribute('x1', X(i)); cx.setAttribute('x2', X(i)); cx.setAttribute('visibility', 'visible');
+      tip.hidden = false;
+      tip.innerHTML = '<b>' + p.date + '</b><br>내 계좌 <span class="num">' + usd(p.mine, 0) + '</span><br>공식 <span class="num">' + usd(p.formula, 0) + '</span><br>전부 매수 <span class="num">' + usd(p.hold, 0) + '</span>';
+      var px = X(i) * rc.width / W; tip.style.top = '4px';
+      tip.style.left = Math.min(Math.max(px - tip.offsetWidth / 2, 0), rc.width - tip.offsetWidth) + 'px';
+    }
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move);
+    svg.addEventListener('pointerleave', function () { tip.hidden = true; cx.setAttribute('visibility', 'hidden'); });
+  }
+
+  function renderTrades() {
+    var box = $('tradeTable'), list = sortedTrades(state.trades).reverse(), c = cfg();
+    if (!list.length) { box.innerHTML = '<div class="empty">아직 기록한 거래가 없습니다. 위의 공식 주문에서 "폼에 채우기"를 누르거나 직접 입력해 첫 거래를 기록하세요.</div>'; return; }
+    var h = '<div class="tw"><table><thead><tr><th>체결일</th><th>구분</th><th>체결가</th><th>수량</th><th>금액</th><th>근거</th><th>메모</th><th></th></tr></thead><tbody>';
+    list.forEach(function (t) {
+      h += '<tr><td class="num">' + t.date + '</td><td class="' + (t.side === 'buy' ? 'up' : 'down') + '">' + (t.side === 'buy' ? '매수' : '매도') + '</td>' +
+        '<td class="num">$' + (+t.price).toFixed(2) + '</td><td class="num">' + t.qty + '</td><td class="num">' + usd(t.price * t.qty) + '</td>' +
+        '<td>' + esc(t.tag || '') + '</td><td class="memo">' + esc(t.memo || '') + '</td>' +
+        '<td>' + (state.canWrite ? '<button type="button" class="del" data-id="' + esc(t.id) + '">삭제</button>' : '') + '</td></tr>';
+    });
+    box.innerHTML = h + '</tbody></table></div>';
+    box.querySelectorAll('.del').forEach(function (b) {
+      b.onclick = function () {
+        if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = '정말 삭제'; setTimeout(function () { b.classList.remove('arm'); b.textContent = '삭제'; }, 3000); return; }
+        var id = b.dataset.id, rest = state.trades.filter(function (t) { return t.id !== id; }), chk = replay(rest, c);
+        if (chk.err) { $('formMsg').className = 'msg err'; $('formMsg').textContent = '이 거래를 지우면 순서가 맞지 않습니다: ' + chk.err; return; }
+        b.disabled = true;
+        state.db.collection('trades').doc(id).delete().catch(function (e) { $('formMsg').className = 'msg err'; $('formMsg').textContent = '삭제하지 못했습니다 (' + e.code + ').'; b.disabled = false; });
+      };
+    });
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
+
+  function renderPrices() {
+    var ks = Object.keys(state.prices).sort().reverse(), box = $('priceList');
+    if (!ks.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="tw"><table><thead><tr><th>날짜</th><th>직접 넣은 종가</th><th></th></tr></thead><tbody>' +
+      ks.map(function (d) { return '<tr><td class="num">' + d + '</td><td class="num">$' + state.prices[d].toFixed(2) + '</td><td>' + (state.canWrite ? '<button type="button" class="del" data-d="' + d + '">삭제</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+    box.querySelectorAll('.del').forEach(function (b) {
+      b.onclick = function () {
+        if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = '정말 삭제'; setTimeout(function () { b.classList.remove('arm'); b.textContent = '삭제'; }, 3000); return; }
+        b.disabled = true; state.db.collection('prices').doc(b.dataset.d).delete().catch(function () { b.disabled = false; });
+      };
+    });
+  }
+
+  // ---- 주문 폼
+  function setSide(s) { state.side = s; $('sideBuy').setAttribute('aria-pressed', s === 'buy'); $('sideSell').setAttribute('aria-pressed', s === 'sell'); updateCalc(); }
+  $('sideBuy').onclick = function () { setSide('buy'); };
+  $('sideSell').onclick = function () { setSide('sell'); };
+  function updateCalc() {
+    var p = +$('tPrice').value, q = +$('tQty').value, c = cfg();
+    if (!(p > 0 && q > 0)) { $('calc').textContent = '체결가와 수량을 넣으면 금액이 계산됩니다.'; return; }
+    var amt = p * q, f = amt * c.fee;
+    $('calc').textContent = (state.side === 'buy' ? '결제 ' + usd(amt + f) : '입금 ' + usd(amt - f)) + ' (대금 ' + usd(amt) + ', 수수료 ' + usd(f) + ')';
+  }
+  ['tPrice', 'tQty'].forEach(function (id) { $(id).addEventListener('input', updateCalc); });
+  $('tDate').addEventListener('change', function () { var m = priceMap(); if (m[$('tDate').value] && !$('tPrice').value) { $('tPrice').value = m[$('tDate').value]; updateCalc(); } });
+  $('maxBtn').onclick = function () {
+    var c = cfg(), s = replay(state.trades, c, $('tDate').value || null), p = +$('tPrice').value;
+    if (state.side === 'sell') $('tQty').value = s.sh;
+    else if (p > 0) $('tQty').value = Math.max(0, Math.floor(s.cash / (p * (1 + c.fee))));
+    updateCalc();
+  };
+  $('tradeForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var msg = $('formMsg'), c = cfg();
+    var t = { side: state.side, date: $('tDate').value, price: Math.round(+$('tPrice').value * 100) / 100, qty: Math.floor(+$('tQty').value), tag: $('tTag').value, memo: $('tMemo').value.trim(), createdAt: Date.now() };
+    msg.className = 'msg err';
+    if (!state.canWrite) { msg.textContent = '이 화면에서는 기록을 저장할 수 없습니다.'; return; }
+    if (!t.date) { msg.textContent = '체결일을 넣어 주세요.'; return; }
+    if (t.date < c.start) { msg.textContent = '체결일이 시작 기준일(' + c.start + ')보다 앞섭니다. 계좌 설정에서 기준일을 바꾸거나 날짜를 고쳐 주세요.'; return; }
+    if (!isTradingDay(t.date)) { msg.textContent = t.date + '은 미국 장이 쉬는 날입니다.'; return; }
+    if (!(t.price > 0)) { msg.textContent = '체결가를 넣어 주세요.'; return; }
+    if (!(t.qty > 0)) { msg.textContent = '수량은 1주 이상이어야 합니다.'; return; }
+    var chk = replay(state.trades.concat([t]), c);
+    if (chk.err) { msg.textContent = '기록할 수 없습니다: ' + chk.err; return; }
+    $('submitBtn').disabled = true;
+    var write = state.cfg ? Promise.resolve() : state.db.doc('config/main').set(c);
+    write.then(function () { return state.db.collection('trades').add(t); }).then(function () {
+      msg.className = 'msg ok'; msg.textContent = t.date + ' ' + (t.side === 'buy' ? '매수' : '매도') + ' ' + t.qty + '주를 기록했습니다.';
+      $('tQty').value = ''; $('tMemo').value = ''; updateCalc();
+    }).catch(function (e) { msg.textContent = '저장하지 못했습니다 (' + (e && e.code) + '). 잠시 뒤 다시 눌러 주세요.'; })
+      .then(function () { $('submitBtn').disabled = false; });
+  });
+
+  $('priceForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var d = $('pDate').value, v = Math.round(+$('pClose').value * 100) / 100, msg = $('pMsg');
+    msg.className = 'msg err';
+    if (!state.canWrite) { msg.textContent = '이 화면에서는 저장할 수 없습니다.'; return; }
+    if (!d || !isTradingDay(d)) { msg.textContent = '미국 장이 열린 날짜를 넣어 주세요.'; return; }
+    if (d <= D.dates[D.dates.length - 1]) { msg.textContent = d + ' 종가는 이미 들어 있습니다.'; return; }
+    if (!(v > 0)) { msg.textContent = '종가를 넣어 주세요.'; return; }
+    $('pBtn').disabled = true;
+    state.db.collection('prices').doc(d).set({ close: v }).then(function () { msg.className = 'msg ok'; msg.textContent = d + ' 종가 $' + v.toFixed(2) + '를 저장했습니다.'; $('pClose').value = ''; })
+      .catch(function (e) { msg.textContent = '저장하지 못했습니다 (' + e.code + ').'; }).then(function () { $('pBtn').disabled = false; });
+  });
+
+  $('setForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var msg = $('sMsg'), n = { start: $('sStart').value, capital: +$('sCap').value, fee: +$('sFee').value / 100 };
+    msg.className = 'msg err';
+    if (!state.canWrite) { msg.textContent = '이 화면에서는 저장할 수 없습니다.'; return; }
+    if (!n.start || !(n.capital >= 100) || !(n.fee >= 0)) { msg.textContent = '값을 모두 바르게 넣어 주세요.'; return; }
+    var first = sortedTrades(state.trades)[0];
+    if (first && first.date < n.start) { msg.textContent = '이미 ' + first.date + ' 거래가 있어 기준일을 그 뒤로 옮길 수 없습니다.'; return; }
+    var chk = replay(state.trades, n);
+    if (chk.err) { msg.textContent = '이 금액으로는 기존 거래가 맞지 않습니다: ' + chk.err; return; }
+    $('sBtn').disabled = true;
+    state.db.doc('config/main').set(n).then(function () { msg.className = 'msg ok'; msg.textContent = '설정을 저장했습니다.'; })
+      .catch(function (e) { msg.textContent = '저장하지 못했습니다 (' + e.code + ').'; }).then(function () { $('sBtn').disabled = false; });
+  });
+
+  function fillSettings() { var c = cfg(); $('sStart').value = c.start; $('sCap').value = c.capital; $('sFee').value = +(c.fee * 100).toFixed(4); }
+  function setWritable(on) {
+    state.canWrite = on;
+    ['submitBtn', 'pBtn', 'sBtn', 'maxBtn'].forEach(function (id) { $(id).disabled = !on; });
+  }
+
+  // ---- 첫 화면 (저장소 연결 전)
+  $('pSplits').textContent = P.splits; $('pStop').textContent = P.stop_days;
+  var dflt = lastTradingOnOrBefore(nyToday());
+  $('tDate').value = dflt; if (priceMap()[dflt]) $('tPrice').value = priceMap()[dflt];
+  $('pDate').value = dflt;
+  setWritable(false); fillSettings(); render();
+
+  // ---- 저장소 연결
+  var got = { trades: false, prices: false, cfg: false }, timer = setTimeout(function () {
+    $('banner').hidden = false; $('banner').textContent = '기록 저장소에 아직 연결되지 않았습니다. 화면의 숫자는 기록이 빠진 상태일 수 있습니다.';
+  }, 10000);
+  function settle(k, snap) {
+    if (!snap.metadata.fromCache) got[k] = true;
+    if (got.trades && got.prices && got.cfg) { clearTimeout(timer); if (!state.readOnly) $('banner').hidden = true; }
+  }
+  function fail(e) { clearTimeout(timer); $('banner').hidden = false; $('banner').textContent = '기록 저장소 연결이 끊겼습니다 (' + e.code + '). 페이지를 다시 열어 주세요.'; setWritable(false); render(); }
+  // 공개 웹페이지 판(D.local)은 Artifact 저장소 대신 이 브라우저의 localStorage 를 같은 모양으로 쓴다
+  var LKEY = 'soxl-paper-v1';
+  function localStore() {
+    var subs = [];
+    function load() { try { return JSON.parse(localStorage.getItem(LKEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { localStorage.setItem(LKEY, JSON.stringify(s)); subs.forEach(function (f) { f(); }); }
+    function write(fn) { return new Promise(function (ok, no) { try { var s = load(); fn(s); save(s); ok(); } catch (e) { no({ code: 'storage' }); } }); }
+    var meta = { fromCache: false, hasPendingWrites: false };
+    function colSnap(name) { var c = load()[name] || {}; return { metadata: meta, docs: Object.keys(c).map(function (id) { return { id: id, exists: true, data: function () { return c[id]; } }; }) }; }
+    function coll(name) {
+      return {
+        add: function (data) { var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); return write(function (s) { (s[name] = s[name] || {})[id] = data; }); },
+        doc: function (id) { return {
+          set: function (data) { return write(function (s) { (s[name] = s[name] || {})[id] = data; }); },
+          delete: function () { return write(function (s) { if (s[name]) delete s[name][id]; }); },
+          onSnapshot: function (next) { var f = function () { var v = (load()[name] || {})[id]; next({ metadata: meta, exists: !!v, data: function () { return v; } }); }; subs.push(f); setTimeout(f, 0); } }; },
+        onSnapshot: function (next) { var f = function () { next(colSnap(name)); }; subs.push(f); setTimeout(f, 0); }
+      };
+    }
+    window.addEventListener('storage', function (e) { if (e.key === LKEY) subs.forEach(function (f) { f(); }); });
+    return { collection: coll, doc: function (p) { var a = p.split('/'); return coll(a[0]).doc(a[1]); }, _dump: function () { return JSON.stringify(load()); },
+             _restore: function (txt) { var s = JSON.parse(txt); if (!s || typeof s !== 'object' || Array.isArray(s)) throw new Error('bad'); save(s); } };
+  }
+  if (D.local) {
+    $('backupCard').hidden = false;
+    $('bkCopy').onclick = function () {
+      var t = state.db ? state.db._dump() : ''; $('bkText').value = t; $('bkText').select();
+      var done = function () { $('bkMsg').className = 'msg ok'; $('bkMsg').textContent = '복사했습니다. 메모장이나 나에게 보내기 카톡에 붙여넣어 두세요.'; };
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function () { $('bkMsg').className = 'msg'; $('bkMsg').textContent = '글자를 선택해 두었습니다. 길게 눌러 복사하세요.'; });
+      else done();
+    };
+    $('bkLoad').onclick = function () {
+      var b = $('bkLoad');
+      if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = '지금 기록을 덮어씁니다. 한 번 더 누르세요'; setTimeout(function () { b.classList.remove('arm'); b.textContent = '붙여넣은 기록으로 바꾸기'; }, 4000); return; }
+      try { state.db._restore($('bkText').value.trim()); $('bkMsg').className = 'msg ok'; $('bkMsg').textContent = '기록을 바꿨습니다.'; }
+      catch (e) { $('bkMsg').className = 'msg err'; $('bkMsg').textContent = '백업 글자가 올바르지 않습니다. "현재 기록 복사"로 만든 글자를 그대로 붙여넣어 주세요.'; }
+    };
+  }
+  var dbReady = D.local ? Promise.resolve(localStore()) : (window.claude && window.claude.use ? window.claude.use('db') : Promise.resolve(null));
+  var ownerReady = D.local ? Promise.resolve(true) : (window.claude && window.claude.use ? window.claude.use('user').then(function (u) { return u ? u.isOwner() : true; }).catch(function () { return true; }) : Promise.resolve(true));
+  dbReady.then(function (db) {
+    if (!db) { clearTimeout(timer); $('banner').textContent = '이 화면에서는 기록을 불러오거나 저장할 수 없습니다. claude.ai 에 로그인한 상태로 열어 주세요.'; return; }
+    state.db = db;
+    ownerReady.then(function (own) {
+      setWritable(own !== false);
+      if (own === false) { state.readOnly = true; $('banner').hidden = false; $('banner').textContent = '보기 전용입니다. 계좌 주인만 거래를 기록할 수 있습니다.'; }
+      render();
+    });
+    db.collection('trades').onSnapshot(function (snap) {
+      state.trades = snap.docs.map(function (d) { var x = Object.assign({}, d.data()); x.id = d.id; return x; });
+      settle('trades', snap); render();
+    }, fail);
+    db.collection('prices').onSnapshot(function (snap) {
+      var p = {}; snap.docs.forEach(function (d) { var v = +d.data().close; if (v > 0) p[d.id] = v; });
+      state.prices = p; settle('prices', snap); render();
+    }, fail);
+    db.doc('config/main').onSnapshot(function (snap) {
+      state.cfg = snap.exists ? snap.data() : null; settle('cfg', snap); fillSettings(); render();
+    }, fail);
+  });
+})();
+</script>
+
+</html>
