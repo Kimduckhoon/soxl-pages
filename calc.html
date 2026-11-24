@@ -18,7 +18,7 @@
   .row .n { font-weight:700; text-align:center; }
   .head { font-size:12px; color:var(--sub); }
   table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
-  #sell th:first-child, #sell td:first-child { width:62px; } #buy th:first-child, #buy td:first-child { width:46px; }
+  #sell th:first-child, #sell td:first-child { width:54px; } #buy th:first-child, #buy td:first-child { width:46px; }
   th, td { border-bottom:1px solid var(--line); padding:7px 3px; overflow-wrap:anywhere; text-align:left; vertical-align:top; }
   th { font-size:12px; color:var(--sub); font-weight:400; }
   td b { font-variant-numeric:tabular-nums; }
@@ -29,7 +29,7 @@
   .tip { color:var(--sub); font-size:13px; margin:8px 0 0; }
   button { font:inherit; font-size:14px; border:1px solid var(--line); background:var(--card); border-radius:8px; padding:6px 10px; }
   a { color:var(--acc); }
-  button.sold { margin-top:5px; padding:3px 7px; font-size:12px; background:var(--hi); }
+  button.sold { margin-top:5px; padding:3px 5px; font-size:11px; white-space:nowrap; background:var(--hi); }
   .gain { color:var(--up); } .loss { color:var(--dn); }
   #hist td button { padding:2px 7px; font-size:12px; }
   dialog { border:1px solid var(--line); border-radius:14px; padding:16px; width:min(92vw,360px); }
@@ -60,7 +60,7 @@
 
   <h2 id="buyh">다음 매수</h2>
   <div class="card"><table id="buy"></table>
-    <p class="tip">하루에 한 포트씩. 내일 종가가 매수가 이하로 마감하면 체결(LOC). 그다음 매수가는 매일 전날 종가로 새로 정해져서, 아침 카톡과 이 화면에 다시 나옵니다.</p></div>
+    <p class="tip">하루에 한 포트씩. 내일 종가가 매수가 이하로 마감하면 체결(LOC). v6 은 내 계좌가 고점보다 15% 넘게 빠져 있으면 수량을 절반으로 줄이세요. 그다음 매수가는 매일 전날 종가로 새로 정해져서, 아침 카톡과 이 화면에 다시 나옵니다.</p></div>
 
   <h2>매도 기록</h2>
   <div class="card"><p id="histsum" style="margin:0 0 6px;font-weight:700"></p><table id="hist"></table>
@@ -83,6 +83,7 @@ const F = [
   {k:"기존", stop:30, sell:0.00, scale:()=>1},
   {k:"v4",   stop:5,  sell:0.10, scale:()=>1},
   {k:"v5",   stop:10, sell:0.10, scale:()=>D.sox_above ? 1 : 0.25},
+  {k:"v6",   stop:10, sell:0.05, scale:()=>0.25 * (D.sox_above ? 1 : 0.25)},
 ];
 const HOL = new Set(D.holidays);
 const $ = id => document.getElementById(id);
@@ -117,7 +118,7 @@ function render(){
   const held = ports.map((p,i)=>({...p, i, price:parseFloat(p.p), qty:parseInt(p.q)||0})).filter(p=>p.d && p.price>0);
   // 매도 시점: 포트 x 공식
   let h = `<tr><th>포트</th>${F.map(f=>`<th>${f.k}<span class="sub">손절 ${f.stop}일 · 목표 +${f.sell*100}%</span></th>`).join("")}</tr>`;
-  if(!held.length) h += `<tr><td colspan="4" class="sub">아직 산 포트가 없습니다.</td></tr>`;
+  if(!held.length) h += `<tr><td colspan="5" class="sub">아직 산 포트가 없습니다.</td></tr>`;
   for(const p of held){
     const pnl = (D.close/p.price-1)*100;
     h += `<tr><td><b>P${p.i+1}</b><span class="sub">${p.price.toFixed(2)}${p.qty?` ×${p.qty}`:""}<br>${pnl>=0?"+":""}${pnl.toFixed(1)}%</span><button class="sold" type="button" data-sell="${p.i}">팔았음</button></td>`;
@@ -136,8 +137,8 @@ function render(){
   let b = `<tr><th>공식</th><th>매수가 (이하 마감 시)</th><th>수량</th></tr>`;
   for(const f of F){
     const budget = free ? cash/free*f.scale() : 0, q = free ? Math.floor(budget/price) : 0;
-    b += `<tr class="${f.k==="v5"&&!D.sox_above?"buy":""}"><td><b>${f.k}</b></td><td><b>${free?price.toFixed(2):"-"}</b></td>
-      <td><b>${cash?q:"-"}</b><span class="sub">${cash&&free?`1회 매수금 $${money(budget)}${f.scale()<1?" (지수 약세 1/4)":""}`:"현금을 적으면 수량이 나와요"}</span></td></tr>`;
+    b += `<tr class="${(f.k==="v5"&&!D.sox_above)||f.k==="v6"?"buy":""}"><td><b>${f.k}</b></td><td><b>${free?price.toFixed(2):"-"}</b></td>
+      <td><b>${cash?q:"-"}</b><span class="sub">${cash&&free?`1회 매수금 $${money(budget)}${f.k==="v6"?" (기본 1/4"+(D.sox_above?"":" · 지수 약세 1/4")+")":f.scale()<1?" (지수 약세 1/4)":""}`:"현금을 적으면 수량이 나와요"}</span></td></tr>`;
   }
   $("buy").innerHTML = b;
   // 매도 기록

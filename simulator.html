@@ -9,14 +9,14 @@
     color-scheme: light;
     --page:#f4f2ee; --surface-1:#fcfcfb; --line:#e3e0d9; --grid:#ebe8e2;
     --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#7c7a74;
-    --series-1:#2a78d6; --series-2:#eb6834; --series-3:#6a4bc4; --series-4:#c2307a; --good:#1a7f37; --bad:#c62f2f; --accent:#2a78d6; --hi:#fff3c4;
+    --series-1:#2a78d6; --series-2:#eb6834; --series-3:#6a4bc4; --series-4:#c2307a; --series-5:#1f7a6a; --good:#1a7f37; --bad:#c62f2f; --accent:#2a78d6; --hi:#fff3c4;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
       --page:#121211; --surface-1:#1a1a19; --line:#33322f; --grid:#2a2927;
       --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#96958c;
-      --series-1:#3987e5; --series-2:#d95926; --series-3:#a891ff; --series-4:#ff7fb9; --good:#4cc26a; --bad:#f07070; --accent:#3987e5; --hi:#4a4220;
+      --series-1:#3987e5; --series-2:#d95926; --series-3:#a891ff; --series-4:#ff7fb9; --series-5:#5fd3b8; --good:#4cc26a; --bad:#f07070; --accent:#3987e5; --hi:#4a4220;
     }
   }
   :root[data-theme="dark"] {
@@ -80,14 +80,14 @@
 <div class="viz-root">
 <main>
   <h1>떨사오팔 과거 시뮬레이터 (SOXL)</h1>
-  <p class="lead">"그때 이 돈으로 시작했다면 지금 얼마일까"를 세 공식(기존·v4·v5)으로 나란히 계산합니다. 과거 종가에 공식을 그대로 적용한 결과입니다.</p>
+  <p class="lead">"그때 이 돈으로 시작했다면 지금 얼마일까"를 네 공식(기존·v4·v5·v6)으로 나란히 계산합니다. 과거 종가에 공식을 그대로 적용한 결과입니다.</p>
 
   <div class="card">
     <div class="controls">
       <label>시작일<input type="date" id="start"></label>
       <label>종료일<input type="date" id="end"></label>
       <label>투자금 (달러)<input type="number" id="capital" min="100" step="100"></label>
-      <label>분할 수 (세 공식 공통)<input type="number" id="splits" min="1" max="40" step="1"></label>
+      <label>분할 수 (네 공식 공통)<input type="number" id="splits" min="1" max="40" step="1"></label>
       <label>수수료율 (%)<input type="number" id="fee" min="0" max="2" step="0.01"></label>
       <label>기존 공식 손절 (거래일)<input type="number" id="stop" min="1" max="250" step="1"></label>
       <label>매수 목표율 (%, 공통)<input type="number" id="buy" step="0.1"></label>
@@ -100,14 +100,14 @@
       <button id="reset">기본값으로 되돌리기</button>
     </div>
     <p class="hint" id="range" style="margin:10px 0 0"></p>
-    <p class="hint" style="margin:4px 0 0">v4 = 손절 5일 · +10% 매도. v5 = 손절 10일 · +10% 매도 · 반도체지수(SOX)가 200일선 아래면 1회 매수금 1/4. 두 공식의 손절·매도 값은 고정입니다.</p>
+    <p class="hint" style="margin:4px 0 0">v4 = 손절 5일 · +10% 매도. v5 = 손절 10일 · +10% 매도 · 반도체지수(SOX)가 200일선 아래면 1회 매수금 1/4. v6 = 손절 10일 · +5% 매도 · 1회 매수금 1/4 (지수 약세면 다시 1/4, 계좌가 고점보다 15% 넘게 빠져 있으면 다시 1/2). v4·v5·v6 의 값은 고정입니다.</p>
   </div>
 
   <div class="tiles" id="tiles"></div>
 
   <div class="card">
     <h2>자산 변화</h2>
-    <div class="legend"><span><i style="background:var(--series-1)"></i>기존</span><span><i style="background:var(--series-3)"></i>v4</span><span><i style="background:var(--series-4)"></i>v5</span><span><i style="background:var(--series-2)"></i>SOXL 단순 보유</span></div>
+    <div class="legend"><span><i style="background:var(--series-1)"></i>기존</span><span><i style="background:var(--series-3)"></i>v4</span><span><i style="background:var(--series-4)"></i>v5</span><span><i style="background:var(--series-5)"></i>v6</span><span><i style="background:var(--series-2)"></i>SOXL 단순 보유</span></div>
     <div class="chartwrap"><svg id="chart" role="img" aria-label="기간별 총자산 변화"></svg><div class="tip" id="tip"></div></div>
     <p class="hint" style="margin:8px 0 0">그래프 위에 마우스를 올리거나 손가락으로 밀면 그 날짜의 자산을 볼 수 있습니다.</p>
   </div>
@@ -154,7 +154,7 @@
     }
     return iso(d);
   }
-  // p: {capital, splits, stopDays, fee, buyPct, sellPct, scale?}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
+  // p: {capital, splits, stopDays, fee, buyPct, sellPct, scale?, base?, brake?}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
   // scale: 날짜별 1회 매수금 비율 배열(선택, 기본 1). t 종가에 내는 다음 날 매수 주문에 적용
   function simulate(dates, closes, holidays, p) {
     var cash = p.capital, open = [], lots = [], rows = [];
@@ -190,9 +190,11 @@
       var held = open.length;
       var H = held === p.splits ? null : cash / (p.splits - held);
       var I = rounddown2(F * (1 + p.buyPct) - 1e-9);
-      var J = H === null ? 0 : Math.floor(H * (p.scale ? p.scale[t] : 1) / I);   // scale: v5 의 지수 약세 시 1회 매수금 비율
       var total = shares * F + cash;
       if (total > peak) peak = total;
+      var sc = (p.base || 1) * (p.scale ? p.scale[t] : 1);                     // scale: v5·v6 의 지수 약세 시 비율, base: v6 기본 비율
+      if (p.brake && total / peak - 1 < p.brake[0]) sc *= p.brake[1];         // brake: v6 계좌 낙폭 브레이크 [기준, 비율]
+      var J = H === null ? 0 : Math.floor(H * sc / I);
       rows.push({ date: d, close: F, held: held, shares: shares, avg: avg, cash: cash, total: total,
                   dd: total / peak - 1, bought: bought ? bought.qty : 0, sold: soldQty });
       prevI = I; prevJ = J; prevHeld = held;
@@ -255,7 +257,8 @@ var DATA = {"dates":["2010-03-11","2010-03-12","2010-03-15","2010-03-16","2010-0
     var FS = [
       { k: '기존', col: 'var(--series-1)', p: p, note: '손절 ' + p.stopDays + '일 · 목표 ' + (p.sellPct * 100).toFixed(1) + '%' },
       { k: 'v4', col: 'var(--series-3)', p: Object.assign({}, p, { stopDays: 5, sellPct: 0.10 }), note: '손절 5일 · +10%' },
-      { k: 'v5', col: 'var(--series-4)', p: Object.assign({}, p, { stopDays: 10, sellPct: 0.10, scale: scale }), note: '손절 10일 · +10% · 지수 약세 1/4' }
+      { k: 'v5', col: 'var(--series-4)', p: Object.assign({}, p, { stopDays: 10, sellPct: 0.10, scale: scale }), note: '손절 10일 · +10% · 지수 약세 1/4' },
+      { k: 'v6', col: 'var(--series-5)', p: Object.assign({}, p, { stopDays: 10, sellPct: 0.05, scale: scale, base: 0.25, brake: [-0.15, 0.5] }), note: '손절 10일 · +5% · 매수금 1/4 · 낙폭 브레이크' }
     ];
     FS.forEach(function (f) { f.r = Tteol.simulate(dates, closes, hol, f.p); });
     var r = FS[pickF].r;
