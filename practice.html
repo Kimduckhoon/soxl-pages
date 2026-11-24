@@ -1,0 +1,375 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SOXL v5 실전 연습</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* 레이아웃: 넓은 화면에서는 가운데 휴대폰 틀, 휴대폰에서는 틀 없이 꽉 차게. 아래 탭 4개(오늘·내 계좌·규칙서·사용법).
+   v5 강조색은 다른 도구와 같은 자홍색. 상승 빨강·하락 파랑(국내 관례). 알림 말풍선은 일반 메신저 모양(특정 앱 흉내 아님). */
+:root {
+  --page:#e7e9ee; --bg:#f4f5f8; --surface:#ffffff; --line:#dfe2e8; --ink:#161a22; --sub:#5b6272; --faint:#8d94a3;
+  --accent:#b8327a; --accent-soft:#f8e6f0; --up:#d2343c; --down:#1d5fcf; --ok:#1f7a4d; --bubble:#fff6c9; --frame:#1b1d22;
+  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-num:"Space Grotesk","IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page:#0a0b0e; --bg:#111318; --surface:#191c23; --line:#2b303b; --ink:#e9ebf0; --sub:#a8afbc; --faint:#757d8c;
+  --accent:#ff7fb9; --accent-soft:#3a1f2e; --up:#ff6b70; --down:#6ea4ff; --ok:#4cc38a; --bubble:#3b3620; --frame:#000; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --page:#0a0b0e; --bg:#111318; --surface:#191c23; --line:#2b303b; --ink:#e9ebf0; --sub:#a8afbc; --faint:#757d8c;
+  --accent:#ff7fb9; --accent-soft:#3a1f2e; --up:#ff6b70; --down:#6ea4ff; --ok:#4cc38a; --bubble:#3b3620; --frame:#000; color-scheme:dark }
+* { box-sizing:border-box }
+html, body { height:100% }
+body { background:var(--page); color:var(--ink); font:15px/1.55 var(--f-body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:20px }
+.num { font-family:var(--f-num); font-variant-numeric:tabular-nums }
+.up { color:var(--up) } .down { color:var(--down) } .ok { color:var(--ok) }
+.phone { max-width:400px; margin:0 auto; height:min(860px, calc(100vh - 40px)); background:var(--bg); border-radius:34px; border:10px solid var(--frame);
+  display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.18) }
+@media (max-width:460px) { body { padding:0 } .phone { max-width:none; height:100%; border:0; border-radius:0; box-shadow:none } }
+.top { background:var(--surface); border-bottom:1px solid var(--line); padding:12px 14px 10px; display:grid; gap:8px }
+.top .row { display:flex; align-items:center; justify-content:space-between; gap:8px }
+.top h1 { margin:0; font-size:17px }
+.top h1 small { font-size:11px; color:var(--accent); font-weight:700; margin-left:6px }
+select, button { font:inherit }
+select { font-size:13px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:8px; padding:4px 6px; max-width:180px }
+.datebar { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--sub) }
+.datebar b { color:var(--ink) }
+.datebar button { border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:8px; padding:3px 9px; font-size:13px; cursor:pointer }
+.datebar button:disabled { opacity:.4; cursor:default }
+.screen { overflow-y:auto; padding:14px; display:grid; gap:12px; align-content:start }
+.screen[hidden] { display:none !important }
+.tabs { display:grid; grid-template-columns:repeat(4,1fr); background:var(--surface); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom, 0px) }
+.tabs button { border:0; background:none; color:var(--faint); padding:10px 4px 12px; font-size:12px; cursor:pointer; display:grid; justify-items:center; gap:2px }
+.tabs button b { font-size:16px; line-height:1 }
+.tabs button[aria-selected="true"] { color:var(--accent); font-weight:700 }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:13px; display:grid; gap:8px; min-width:0 }
+.label { font-size:12px; color:var(--faint); letter-spacing:.04em }
+h2 { margin:0; font-size:16px } h3 { margin:0; font-size:15px }
+p { margin:0 } .sub { color:var(--sub) } .small { font-size:12px; color:var(--faint) }
+/* 알림 말풍선 */
+.chat { display:grid; gap:4px }
+.chat .who { font-size:12px; color:var(--sub); display:flex; align-items:center; gap:6px }
+.chat .who i { width:22px; height:22px; border-radius:7px; background:var(--accent); display:inline-block }
+.bubble { background:var(--bubble); border-radius:4px 14px 14px 14px; padding:10px 12px; font-size:14px; line-height:1.6; white-space:pre-line; max-width:92% }
+.bubble .t { font-weight:700 } .bubble .v5 { color:var(--accent); font-weight:700 }
+.bubble .link { display:block; margin-top:8px; text-align:center; background:var(--surface); border-radius:8px; padding:6px; font-size:13px; color:var(--sub) }
+/* 주문표 */
+.ticket { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--bg) }
+.side { font-size:12px; font-weight:700; color:#fff; padding:3px 8px; border-radius:6px }
+.side.b { background:var(--up) } .side.s { background:var(--down) } .side.m { background:var(--ink); color:var(--surface) }
+.ticket .what { min-width:0 } .ticket .what b { font-family:var(--f-num) } .ticket .what span { display:block; font-size:12px; color:var(--sub) }
+.ticket button { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:8px; padding:5px 9px; font-size:12px; cursor:pointer; white-space:nowrap }
+.ticket button[aria-pressed="true"] { background:var(--ok); color:#fff; border-color:var(--ok) }
+.primary { border:0; background:var(--accent); color:#fff; font-weight:700; border-radius:12px; padding:13px; font-size:15px; cursor:pointer }
+.primary:disabled { opacity:.45; cursor:default }
+.ghost { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:10px; padding:8px; font-size:13px; cursor:pointer }
+.result li { margin:3px 0 } .result ul { margin:0; padding-left:18px }
+/* 계좌 */
+.kpi { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px }
+.kpi div { background:var(--bg); border-radius:10px; padding:8px 10px; display:grid } .kpi span { font-size:12px; color:var(--faint) } .kpi b { font-family:var(--f-num); font-size:17px }
+.tw { overflow-x:auto; border:1px solid var(--line); border-radius:10px }
+table { border-collapse:collapse; width:100%; font-size:12.5px }
+th, td { padding:7px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap }
+th { color:var(--faint); font-weight:500; background:var(--bg) }
+th:first-child, td:first-child { text-align:left } tr:last-child td { border-bottom:0 }
+.chart svg { display:block; width:100%; height:auto } .chart text { fill:var(--faint); font:10px var(--f-num) }
+.legend { display:flex; gap:12px; font-size:12px; color:var(--sub) } .legend i { display:inline-block; width:12px; height:3px; border-radius:2px; vertical-align:middle; margin-right:5px }
+/* 규칙서·사용법 */
+.rule { display:grid; grid-template-columns:78px 1fr; gap:10px; padding:9px 0; border-bottom:1px solid var(--line) } .rule:last-child { border:0 }
+.rule .k { font-weight:700 } .rule .k small { display:block; font-weight:400; font-size:11px; color:var(--faint) } .rule.new .k { color:var(--accent) }
+.money { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; text-align:center }
+.money div { background:var(--bg); border-radius:10px; padding:8px 4px; display:grid } .money b { font-family:var(--f-num); font-size:16px } .money span { font-size:11px; color:var(--sub) }
+.money .on { background:var(--accent-soft); color:var(--accent) }
+ol.steps { margin:0; padding:0; list-style:none; counter-reset:n; display:grid; gap:8px }
+ol.steps li { counter-increment:n; display:grid; grid-template-columns:24px 1fr; gap:8px }
+ol.steps li::before { content:counter(n); width:22px; height:22px; border-radius:50%; background:var(--ink); color:var(--surface); font:700 12px/22px var(--f-num); text-align:center }
+ul.plain { margin:0; padding-left:18px; display:grid; gap:4px; color:var(--sub) }
+.hl { background:var(--accent-soft); color:var(--accent); border-radius:6px; padding:1px 6px; font-weight:700 }
+button:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important } }
+</style>
+
+<div class="phone" role="application" aria-label="v5 실전 연습">
+  <div class="top">
+    <div class="row"><h1>v5 실전 연습<small>모의</small></h1>
+      <select id="start" aria-label="연습 시작 시점">
+        <option value="2026-09-01">9월 시작 (상승 후 폭락)</option>
+        <option value="2026-06-01">6월 시작</option>
+        <option value="2026-01-02">올해 1월 시작</option>
+      </select></div>
+    <div class="datebar"><button id="prev" type="button" aria-label="하루 전">◀</button><span><b id="today">-</b> 장 마감 후</span><button id="next" type="button" aria-label="다음 날">▶</button><button id="reset" type="button">처음부터</button><button id="toEnd" type="button">끝까지</button></div>
+  </div>
+
+  <section class="screen" id="s-today" aria-label="오늘">
+    <div class="card" id="resultCard" hidden></div>
+    <div class="chat">
+      <div class="who"><i></i>SOXL 알림 · 오전 8:50</div>
+      <div class="bubble" id="bubble"></div>
+    </div>
+    <div class="card">
+      <div class="label">증권사 앱에 넣을 주문 · <span id="ordDate"></span></div>
+      <div id="tickets" style="display:grid;gap:8px"></div>
+      <p class="small">LOC: 종가가 정한 가격 이하(매수)·이상(매도)이면 종가에 체결. MOC: 종가에 무조건 체결. "주문했어요"는 연습용 체크입니다.</p>
+    </div>
+    <button class="primary" id="advance" type="button">다음 날 장 마감 보기 ▶</button>
+  </section>
+
+  <section class="screen" id="s-acct" aria-label="내 계좌" hidden>
+    <div class="card"><div class="label">v5 연습 계좌 · <span id="acctDate"></span></div>
+      <div class="kpi" id="kpi"></div></div>
+    <div class="card"><h3>보유 포트</h3><div class="tw"><table id="hold"></table></div>
+      <p class="small">목표가 이상으로 마감하면 매도, 손절일에는 종가에 매도.</p></div>
+    <div class="card chart"><h3>자산 변화</h3>
+      <div class="legend"><span><i style="background:var(--accent)"></i>v5</span><span><i style="background:var(--faint)"></i>그냥 보유</span></div>
+      <svg id="eq" viewBox="0 0 360 150"></svg></div>
+    <div class="card"><h3>매도 기록</h3><p id="histsum" class="sub"></p><div class="tw"><table id="hist"></table></div></div>
+  </section>
+
+  <section class="screen" id="s-rules" aria-label="규칙서" hidden>
+    <div class="card"><div class="label">떨사오팔 · 주 공식</div><h2>SOXL v5 매매 규칙서</h2>
+      <p class="sub">기존 떨사오팔(7포트, 떨어지면 사고 오르면 판다)에서 세 가지만 바꿨습니다. 계산은 알림과 계산기가 해 주니, 나오는 숫자대로 주문만 넣으면 됩니다.</p></div>
+    <div class="card"><h3>규칙</h3>
+      <div class="rule"><span class="k">사는 날<small>기존과 같음</small></span><span>오늘 종가가 어제 종가보다 낮게 마감하면 한 포트 삽니다.</span></div>
+      <div class="rule new"><span class="k">파는 날<small>기존: 산 값</small></span><span>산 값보다 <b>10%</b> 오른 값 이상으로 마감하면 그 포트를 팝니다.</span></div>
+      <div class="rule new"><span class="k">손절<small>기존: 30일</small></span><span>산 날부터 <b>10거래일</b>째 종가에 무조건 팝니다.</span></div>
+      <div class="rule new"><span class="k">약세장<small>새로 추가</small></span><span>반도체지수가 200일 평균보다 낮으면 그 포트에서 <b>1/4만</b> 삽니다.</span></div></div>
+    <div class="card"><h3>"1/4만 산다"는 이런 뜻 (단위는 달러)</h3>
+      <div class="money num"><div><b>$70,000</b><span>시작 돈</span></div><div><b>$10,000</b><span>한 포트 (÷7)</span></div><div class="on"><b>$2,500</b><span>약세장 실제 매수</span></div></div>
+      <p class="sub">쓰지 않은 7,500달러는 현금으로 남아 다음 매수 때 다시 나눠 씁니다. 지수가 200일 평균 위로 오면 다시 한 포트를 다 삽니다. 수량은 알림이 계산해 줍니다.</p></div>
+    <div class="card"><h3>주문 계산 예시 (11/23 종가 기준)</h3>
+      <div class="tw"><table>
+        <tr><td>남은 현금 ÷ 빈 포트 7개</td><td class="num">$10,000</td></tr>
+        <tr><td>반도체지수 200일선 아래 → × 1/4</td><td class="num">$2,500</td></tr>
+        <tr><td>매수가 (종가 43.21 − 0.01)</td><td class="num">$43.20</td></tr>
+        <tr><td>수량 (2,500 ÷ 43.20, 버림)</td><td class="num">57주</td></tr>
+        <tr><td>체결되면 목표가 / 손절일</td><td class="num">$47.52 / 12월 9일</td></tr></table></div></div>
+    <div class="card"><h3>왜 이렇게 바꿨나</h3><ul class="plain">
+      <li><b>손절 10일</b>: 비싸게 산 포트를 30일씩 끌고 가다 크게 잃는 일이 기존 공식의 가장 큰 손실 원인이었습니다.</li>
+      <li><b>+10%에 팔기</b>: 손절을 짧게 한 만큼 이익은 크게 가져갑니다.</li>
+      <li><b>약세장 1/4</b>: 아예 안 사면 떨어진 뒤 반등을 놓쳤고, 조금만 사는 쪽이 결과가 가장 좋았습니다.</li>
+      <li>1994~2019년 자료로 고르고, 고를 때 보지 않은 2020~2026년으로 확인했습니다.</li></ul></div>
+    <div class="card"><h3>7만 달러로 시작했다면 (2026-11-23 기준)</h3>
+      <div class="tw"><table>
+        <tr><th>시작</th><th>v5</th><th>기존 공식</th><th>그냥 보유</th></tr>
+        <tr><td>2022년 1월</td><td class="num"><b>$239,704</b></td><td class="num">$131,100</td><td class="num">$41,868</td></tr>
+        <tr><td>2020년 1월</td><td class="num"><b>$514,081</b></td><td class="num">$363,872</td><td class="num">$155,121</td></tr>
+        <tr><td>2010년 1월</td><td class="num"><b>$2,220,681</b></td><td class="num">$1,716,150</td><td class="num">$4,019,262</td></tr>
+        <tr><td>최대 낙폭 (2010~)</td><td class="num"><b>−45%</b></td><td class="num">−75%</td><td class="num">−91%</td></tr></table></div>
+      <p class="small">수수료 0.2%. 1994~2026 이어서: v5 연복리 +18.8%·최대 낙폭 −80%, 기존 +3.9%·−98%. 2010년 3월 이전은 반도체지수로 만든 합성 가격.</p></div>
+    <div class="card"><h3>알고 따르세요</h3><ul class="plain">
+      <li>폭락이 시작될 때는 지수가 아직 200일 평균 위라 1/4 축소가 늦게 걸립니다. 9월 시작 연습의 10월처럼 손절이 연달아 나올 수 있습니다.</li>
+      <li>강세장이 길면 기존 공식이나 그냥 보유보다 덜 벌 때가 있습니다.</li>
+      <li>1994년부터 이어 굴리면 금융위기 때 계좌가 −80%까지 빠졌습니다. 과거 결과는 앞으로를 보장하지 않습니다.</li></ul></div>
+  </section>
+
+  <section class="screen" id="s-guide" aria-label="사용법" hidden>
+    <div class="card"><h2>매일 할 일</h2><ol class="steps">
+      <li><div>아침 8:50 알림의 맨 위 <span class="hl">v5</span> 줄을 봅니다.</div></li>
+      <li><div>나온 가격·수량 그대로 증권사 앱에 주문합니다. 매수·매도는 <b>LOC</b>, 손절은 <b>MOC</b>.</div></li>
+      <li><div>체결되면 포트 계산기에 적고, 팔았으면 <b>팔았음</b>을 누릅니다.</div></li></ol>
+      <p class="small">이 연습 앱의 "오늘" 탭이 바로 이 흐름입니다. ▶를 누르며 하루씩 해 보세요.</p></div>
+    <div class="card"><h3>알림 읽는 법</h3><ul class="plain">
+      <li><b>매수 43.20 이하 마감 시 57주</b> → 앱에서 LOC 매수 43.20달러, 57주.</li>
+      <li><b>매도 47.52 이상 57주</b> → 그 포트를 LOC 매도 47.52달러에.</li>
+      <li><b>손절 MOC 66주</b> → 그 포트를 종가에 무조건 매도.</li>
+      <li><b>금액 1/4</b> → 반도체지수가 약한 날. 수량에 이미 반영돼 있습니다.</li>
+      <li>아래 "다른 공식 매수" 줄은 참고용입니다.</li></ul></div>
+    <div class="card"><h3>도구</h3><ul class="plain">
+      <li><a href="https://kimduckhoon.github.io/soxl-pages/calc.html">포트 계산기</a>: 산 포트만 적으면 파는 가격·손절일·다음 매수 수량.</li>
+      <li><a href="https://kimduckhoon.github.io/soxl-pages/paper.html">모의투자</a>: 연습 계좌를 공식들과 비교.</li>
+      <li><a href="https://kimduckhoon.github.io/soxl-pages/simulator.html">과거 시뮬레이터</a>: 1994년부터, SOXL·TQQQ.</li>
+      <li><a href="https://kimduckhoon.github.io/soxl-pages/guide.html">사용방법</a> · <a href="https://kimduckhoon.github.io/soxl-pages/v5.html">v5 규칙서</a></li></ul></div>
+    <div class="card"><h3>용어</h3>
+      <div class="rule"><span class="k">포트</span><span>돈을 7칸으로 나눈 한 칸. 한 번 산 묶음.</span></div>
+      <div class="rule"><span class="k">LOC</span><span>종가가 정한 가격 이하(매수)·이상(매도)이면 종가에 체결.</span></div>
+      <div class="rule"><span class="k">MOC</span><span>가격 상관없이 종가에 무조건 체결. 손절에 씁니다.</span></div>
+      <div class="rule"><span class="k">200일선</span><span>최근 200거래일 평균. 지수가 이보다 낮으면 약세.</span></div>
+      <div class="rule"><span class="k">최대 낙폭</span><span>계좌가 가장 높았을 때에서 가장 많이 떨어진 비율 (MDD).</span></div></div>
+    <p class="small">모의 운영용 연습 화면입니다. 투자 권유가 아니며, 과거 결과가 미래 수익을 보장하지 않습니다.</p>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" type="button" data-s="s-today" aria-selected="true"><b>●</b>오늘</button>
+    <button role="tab" type="button" data-s="s-acct" aria-selected="false"><b>$</b>내 계좌</button>
+    <button role="tab" type="button" data-s="s-rules" aria-selected="false"><b>≡</b>규칙서</button>
+    <button role="tab" type="button" data-s="s-guide" aria-selected="false"><b>?</b>사용법</button>
+  </nav>
+</div>
+
+<script>// 떨사오팔 계산 엔진 (engine.py 와 같은 규칙). 브라우저와 node 양쪽에서 쓴다.
+// dates: 'YYYY-MM-DD' 문자열 배열(오름차순), closes: 종가 배열, holidays: Set('YYYY-MM-DD')
+(function (root) {
+  function rounddown2(x) { return Math.floor(x * 100 + 1e-9) / 100; }
+  function sround(x) { var s = x < 0 ? -1 : 1; return s * Math.floor(Math.abs(x) * 100 + 0.5 + 1e-9) / 100; }
+  function iso(d) { return d.toISOString().slice(0, 10); }
+  function workday(dateStr, n, holidays) {
+    var d = new Date(dateStr + 'T00:00:00Z'), left = n;
+    while (left > 0) {
+      d.setUTCDate(d.getUTCDate() + 1);
+      var wd = d.getUTCDay();
+      if (wd !== 0 && wd !== 6 && !holidays.has(iso(d))) left--;
+    }
+    return iso(d);
+  }
+  // p: {capital, splits, stopDays, fee, buyPct, sellPct, scale?, base?, brake?}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
+  // scale: 날짜별 1회 매수금 비율 배열(선택, 기본 1). t 종가에 내는 다음 날 매수 주문에 적용
+  function simulate(dates, closes, holidays, p) {
+    var cash = p.capital, open = [], lots = [], rows = [];
+    var prevI = null, prevJ = 0, prevHeld = 0, cumCost = 0, shares = 0, avg = 0, peak = -Infinity, fees = 0;
+    for (var t = 0; t < dates.length; t++) {
+      var d = dates[t], F = Math.round(closes[t] * 100) / 100, sold = [], proceeds = 0;
+      for (var k = 0; k < open.length; k++) {
+        var lot = open[k];
+        if (lot.buyIdx === t) continue;
+        var reason = d >= lot.stopDate ? '손절' : (F >= lot.target ? '익절' : null);
+        if (reason) {
+          var gross = lot.qty * F, sfee = gross * p.fee;
+          lot.sellIdx = t; lot.sellDate = d; lot.sellPrice = F; lot.result = reason;
+          lot.realized = sround(gross - sfee - (lot.amount + lot.fee));
+          proceeds += gross - sfee; fees += sfee; sold.push(lot);
+        }
+      }
+      var bought = null;
+      if (t > 0 && prevI !== null && F <= prevI && prevHeld < p.splits && prevJ > 0) {
+        var amount = prevJ * F;
+        bought = { buyIdx: t, buyDate: d, price: F, qty: prevJ, amount: amount, fee: amount * p.fee,
+                   stopDate: workday(d, p.stopDays, holidays), target: sround(F * (1 + p.sellPct)),
+                   sellIdx: null, sellDate: null, sellPrice: null, realized: null, result: '보유' };
+        fees += bought.fee;
+      }
+      var soldQty = 0; sold.forEach(function (l) { soldQty += l.qty; });
+      cumCost += (bought ? bought.qty * bought.price : 0) - soldQty * avg;
+      shares += (bought ? bought.qty : 0) - soldQty;
+      avg = shares ? cumCost / shares : 0;
+      cash = sround(cash - (bought ? bought.amount + bought.fee : 0) + proceeds);
+      if (sold.length) open = open.filter(function (l) { return l.sellIdx === null; });
+      if (bought) { lots.push(bought); open.push(bought); }
+      var held = open.length;
+      var H = held === p.splits ? null : cash / (p.splits - held);
+      var I = rounddown2(F * (1 + p.buyPct) - 1e-9);
+      var total = shares * F + cash;
+      if (total > peak) peak = total;
+      var sc = (p.base || 1) * (p.scale ? p.scale[t] : 1);                     // scale: v5·v6 의 지수 약세 시 비율, base: v6 기본 비율
+      if (p.brake && total / peak - 1 < p.brake[0]) sc *= p.brake[1];         // brake: v6 계좌 낙폭 브레이크 [기준, 비율]
+      var J = H === null ? 0 : Math.floor(H * sc / I);
+      rows.push({ date: d, close: F, held: held, shares: shares, avg: avg, cash: cash, total: total,
+                  dd: total / peak - 1, bought: bought ? bought.qty : 0, sold: soldQty });
+      prevI = I; prevJ = J; prevHeld = held;
+    }
+    return { rows: rows, lots: lots, fees: fees };
+  }
+  var api = { simulate: simulate, workday: workday };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Tteol = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>
+const DATA = {"dates":["2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025-12-05","2025-12-08","2025-12-09","2025-12-10","2025-12-11","2025-12-12","2025-12-15","2025-12-16","2025-12-17","2025-12-18","2025-12-19","2025-12-22","2025-12-23","2025-12-24","2025-12-26","2025-12-29","2025-12-30","2025-12-31","2026-01-02","2026-01-05","2026-01-06","2026-01-07","2026-01-08","2026-01-09","2026-01-12","2026-01-13","2026-01-14","2026-01-15","2026-01-16","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-09","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-06","2026-04-07","2026-04-08","2026-04-09","2026-04-10","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10","2026-06-11","2026-06-12","2026-06-15","2026-06-16","2026-06-17","2026-06-18","2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21","2026-08-24","2026-08-25","2026-08-26","2026-08-27","2026-08-28","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-14","2026-09-15","2026-09-16","2026-09-17","2026-09-18","2026-09-21","2026-09-22","2026-09-23","2026-09-24","2026-09-25","2026-09-28","2026-09-29","2026-09-30","2026-10-01","2026-10-02","2026-10-05","2026-10-06","2026-10-07","2026-10-08","2026-10-09","2026-10-12","2026-10-13","2026-10-14","2026-10-15","2026-10-16","2026-10-19","2026-10-20","2026-10-21","2026-10-22","2026-10-23","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-11-02","2026-11-03","2026-11-04","2026-11-05","2026-11-06","2026-11-09","2026-11-10","2026-11-11","2026-11-12","2026-11-13","2026-11-16","2026-11-17","2026-11-18","2026-11-19","2026-11-20","2026-11-23"],"closes":[41.31,43.8,46.58,45.16,46.5,47.99,47.79,49.65,48.79,41.71,41.18,40.49,36.01,38.58,41.72,43.26,43.7,44.21,44.21,43.82,43.67,42.03,47.24,49.22,54.01,52.29,49.65,53.95,54.65,56.07,55.38,58.08,60.75,57.94,63.48,63.72,61.6,60.7,64.96,70.09,70.47,61.79,65.2,61.2,53.19,53.25,61.75,64.03,63.34,68.05,63.1,64.59,64.35,66.29,65.23,67.11,65.86,68.53,71.86,65.34,62.77,62.76,53.42,56.62,54.8,47.89,53.32,54.59,56.09,50.28,50.72,53.69,54.95,54.02,54.85,51.14,53.03,54.96,57.04,48.97,46.61,40.62,47.91,52.26,52.75,54.81,56.55,67.5,71.98,76.39,80.56,85.31,85.96,88.37,94.68,95.94,98.09,105.64,112.77,128.32,123.39,109.56,117.97,126.98,130.4,127.55,144.16,165.85,152.1,176.94,190.42,172.52,184.24,186.19,164.18,151.75,151.89,173.2,178.39,190.56,225.79,217.98,224.63,224.34,227.03,266.32,280.54,262.7,182.54,211.44,201.68,180.65,223.99,234.68,272.5,226.19,233.86,279.29,300.77,231.42,229.57,252.61,215.6,236.52,266.71,217.55,181.47,194.65,165.28,174.82,192.45,192.26,165.37,176.66,165.55,142.48,135.47,136.81,158.54,160.99,157.5,136.81,128.15,109.54,91.99,114.72,114.72,116.71,139.9,132.07,132.33,140.25,130.0,133.0,142.16,145.36,144.95,151.53,129.1,120.74,122.21,120.6,111.16,115.67,116.6,123.05,111.34,112.79,105.91,106.35,106.74,117.28,123.27,125.87,115.76,121.82,101.13,102.32,103.97,114.82,123.67,141.93,151.95,146.25,146.33,151.45,142.29,147.0,147.86,153.69,163.71,164.27,164.26,158.91,142.52,139.76,128.4,127.57,110.54,107.35,93.67,98.65,97.55,103.24,82.11,83.56,90.5,101.08,107.35,102.39,77.05,68.17,73.12,66.68,40.87,45.97,56.2,56.06,66.03,65.53,58.32,48.76,49.07,49.26,45.3,30.88,43.21],"up":[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],"holidays":["2010-01-01","2010-01-18","2010-02-15","2010-04-02","2010-05-31","2010-07-05","2010-09-06","2010-11-25","2010-12-24","2011-01-17","2011-02-21","2011-04-22","2011-05-30","2011-07-04","2011-09-05","2011-11-24","2011-12-26","2012-01-02","2012-01-16","2012-02-20","2012-04-06","2012-05-28","2012-07-04","2012-09-03","2012-10-29","2012-10-30","2012-11-22","2012-12-25","2013-01-01","2013-01-21","2013-02-18","2013-03-29","2013-05-27","2013-07-04","2013-09-02","2013-11-28","2013-12-25","2014-01-01","2014-01-20","2014-02-17","2014-04-18","2014-05-26","2014-07-04","2014-09-01","2014-11-27","2014-12-25","2015-01-01","2015-01-19","2015-02-16","2015-04-03","2015-05-25","2015-07-03","2015-09-07","2015-11-26","2015-12-25","2016-01-01","2016-01-18","2016-02-15","2016-03-25","2016-05-30","2016-07-04","2016-09-05","2016-11-24","2016-12-26","2017-01-02","2017-01-16","2017-02-20","2017-04-14","2017-05-29","2017-07-04","2017-09-04","2017-11-23","2017-11-25","2017-12-25","2018-01-01","2018-01-15","2018-02-19","2018-03-30","2018-05-28","2018-07-04","2018-09-03","2018-11-22","2018-12-05","2018-12-25","2019-01-01","2019-01-21","2019-02-18","2019-04-19","2019-05-27","2019-07-04","2019-09-02","2019-11-28","2019-12-25","2020-01-01","2020-01-20","2020-02-17","2020-04-10","2020-05-25","2020-07-03","2020-09-07","2020-11-26","2020-12-25","2021-01-01","2021-01-18","2021-02-15","2021-04-02","2021-05-31","2021-07-05","2021-09-06","2021-11-25","2021-12-24","2022-01-17","2022-02-21","2022-04-15","2022-05-30","2022-06-20","2022-07-04","2022-09-05","2022-11-24","2022-12-26","2023-01-02","2023-01-16","2023-02-20","2023-04-07","2023-05-29","2023-06-19","2023-07-04","2023-09-04","2023-11-23","2023-12-25","2024-01-01","2024-01-15","2024-02-19","2024-03-29","2024-05-27","2024-06-19","2024-07-04","2024-09-02","2024-11-28","2024-12-25","2025-01-01","2025-01-09","2025-01-20","2025-02-17","2025-04-18","2025-05-26","2025-06-19","2025-07-04","2025-09-01","2025-11-27","2025-12-25","2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25","2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31","2027-06-18","2027-09-06","2027-11-25","2027-12-24"]};
+(function () {
+  const $ = id => document.getElementById(id);
+  const D = DATA.dates, C = DATA.closes, UP = DATA.up, HOL = new Set(DATA.holidays);
+  const P = { capital: 70000, splits: 7, stopDays: 10, sellPct: 0.10, buyPct: 0, fee: 0.002 };
+  const WD = "일월화수목금토";
+  const md = s => { const d = new Date(s + "T00:00:00Z"); return (d.getUTCMonth() + 1) + "/" + d.getUTCDate() + "(" + WD[d.getUTCDay()] + ")"; };
+  const usd = (x, dg) => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: dg || 0, maximumFractionDigits: dg || 0 });
+  const pct = x => (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%";
+  const rd2 = x => Math.floor(x * 100 + 1e-9) / 100;
+  let s0 = 0, cur = 0, done = {};
+
+  function sim(upto) {      // s0(기준일) ~ upto 까지 v5
+    const ds = D.slice(s0, upto + 1), cs = C.slice(s0, upto + 1), sc = UP.slice(s0, upto + 1).map(u => u ? 1 : 0.25);
+    return Tteol.simulate(ds, cs, HOL, Object.assign({ scale: sc }, P));
+  }
+  function nextDate(i) { return i + 1 < D.length ? D[i + 1] : Tteol.workday(D[i], 1, HOL); }
+  function orders(r, i) {
+    const nd = nextDate(i), last = r.rows[r.rows.length - 1], out = [];
+    r.lots.filter(l => l.sellIdx === null).forEach(l => {
+      if (nd >= l.stopDate) out.push({ side: "m", kind: "MOC", txt: "손절 매도", qty: l.qty, note: md(l.buyDate) + " 산 포트 · 손절일" });
+      else out.push({ side: "s", kind: "LOC", txt: "매도", price: l.target, qty: l.qty, note: md(l.buyDate) + " " + l.price.toFixed(2) + "에 산 포트 · 손절일 " + md(l.stopDate) });
+    });
+    let buy = null;
+    if (last.held < P.splits) {
+      const scale = UP[i] ? 1 : 0.25, I = rd2(last.close - 1e-9), H = last.cash / (P.splits - last.held), J = Math.floor(H * scale / I);
+      if (J > 0) { buy = { side: "b", kind: "LOC", txt: "매수", price: I, qty: J, scale: scale, budget: H * scale,
+        note: "1회 매수금 " + usd(H * scale) + (scale < 1 ? " (반도체지수 200일선 아래 → 1/4)" : "") }; out.push(buy); }
+    }
+    return { nd, out, buy, last };
+  }
+  function render() {
+    const r = sim(cur), o = orders(r, cur), last = o.last, scale = UP[cur] ? 1 : 0.25;
+    $("today").textContent = md(D[cur]);
+    $("prev").disabled = cur <= s0 + 1; $("next").disabled = cur >= D.length - 1; $("advance").disabled = cur >= D.length - 1;
+    $("advance").textContent = cur >= D.length - 1 ? "오늘(최신 종가)까지 왔어요" : md(o.nd) + " 장 마감 보기 ▶";
+    // 어제 결과
+    const rc = $("resultCard");
+    if (cur > s0 + 1) {
+      const prev = sim(cur - 1), po = orders(prev, cur - 1), today = D[cur], items = [];
+      const bought = r.lots.find(l => l.buyIdx === cur - s0);
+      if (po.buy) items.push(bought ? `<li class="up">매수 체결: ${bought.qty}주 × $${bought.price.toFixed(2)} (목표가 $${bought.target.toFixed(2)}, 손절일 ${md(bought.stopDate)})</li>`
+                                    : `<li>매수 미체결: 종가 $${last.close.toFixed(2)} 가 매수가 $${po.buy.price.toFixed(2)} 보다 높았어요</li>`);
+      r.lots.filter(l => l.sellIdx === cur - s0).forEach(l => items.push(`<li class="${l.realized >= 0 ? "up" : "down"}">${l.result === "익절" ? "목표가 매도" : "손절 매도"}: ${l.qty}주 × $${l.sellPrice.toFixed(2)} → ${l.realized >= 0 ? "+" : "−"}${usd(Math.abs(l.realized))}</li>`));
+      if (!items.length) items.push("<li>체결된 주문이 없어요</li>");
+      const ch = last.close / C[cur - 1] - 1;
+      rc.hidden = false;
+      rc.innerHTML = `<div class="label">${md(today)} 장 결과</div><p>SOXL 종가 <b class="num">$${last.close.toFixed(2)}</b> <span class="${ch >= 0 ? "up" : "down"} num">${pct(ch)}</span></p><div class="result"><ul>${items.join("")}</ul></div><p class="small">계좌 ${usd(last.total)} (${pct(last.total / P.capital - 1)}) · 보유 ${last.held}/7포트</p>`;
+    } else { rc.hidden = true; }
+    // 알림 말풍선
+    const b = o.buy, moc = o.out.filter(x => x.kind === "MOC"), loc = o.out.filter(x => x.side === "s").sort((a, c) => a.price - c.price);
+    const label = [b ? "매수" + (b.scale < 1 ? " (금액 1/4)" : "") : (last.held >= 7 ? "매수 없음 (7포트 보유)" : ""), moc.length ? "손절 " + moc.length + "포트" : "", loc.length ? "매도 대기 " + loc.length + "포트" : ""].filter(Boolean).join(" · ") || "주문 없음";
+    const parts = [b ? `매수 ${b.price.toFixed(2)} 이하 마감 시 ${b.qty}주` : "", moc.length ? `손절 MOC ${moc.reduce((a, x) => a + x.qty, 0)}주` : "", loc.length ? "매도 " + loc.slice(0, 3).map(x => x.price.toFixed(2) + " 이상 " + x.qty + "주").join(", ") + (loc.length > 3 ? " 외" : "") : ""].filter(Boolean);
+    const shortT = (b ? `매수 ${b.price.toFixed(2)}×${b.qty}` : "매수 없음") + (moc.length ? ` · 손절 ${moc.reduce((a, x) => a + x.qty, 0)}주` : "") + (loc.length ? ` · 매도대기 ${loc.length}` : "");
+    $("bubble").innerHTML = `<span class="t">[SOXL] ${md(o.nd)} <span class="v5">v5: ${shortT}</span></span>\n<span class="v5">v5 의견: ${label}</span>\n${parts.join("\n") || "주문 없음"}\nv5 계좌 ${usd(last.total)} (${pct(last.total / P.capital - 1)}) · ${last.held}/7포트\n<span class="small">반도체지수 200일선 ${UP[cur] ? "위 → 한 포트 다 사기" : "아래 → 1/4만 사기"}</span><span class="link">리포트 보기</span>`;
+    // 주문표
+    $("ordDate").textContent = md(o.nd) + " 종가 주문";
+    $("tickets").innerHTML = o.out.length ? o.out.map((x, k) => {
+      const key = cur + ":" + k;
+      return `<div class="ticket"><span class="side ${x.side}">${x.side === "b" ? "매수" : x.side === "s" ? "매도" : "손절"}</span><div class="what"><b>SOXL ${x.kind}${x.price ? " $" + x.price.toFixed(2) : ""} × ${x.qty}주</b><span>${x.note}</span></div><button type="button" data-k="${key}" aria-pressed="${!!done[key]}">${done[key] ? "주문함 ✓" : "주문했어요"}</button></div>`;
+    }).join("") : `<p class="sub">내일은 넣을 주문이 없어요.</p>`;
+    // 계좌
+    $("acctDate").textContent = md(D[cur]) + " 종가 기준";
+    const closed = r.lots.filter(l => l.sellIdx !== null), realized = closed.reduce((a, l) => a + l.realized, 0);
+    $("kpi").innerHTML = `<div><span>총자산</span><b>${usd(last.total)}</b></div><div><span>수익률</span><b class="${last.total >= P.capital ? "up" : "down"}">${pct(last.total / P.capital - 1)}</b></div>` +
+      `<div><span>현금</span><b>${usd(last.cash)}</b></div><div><span>보유</span><b>${last.held}/7포트 · ${last.shares}주</b></div>` +
+      `<div><span>실현 손익</span><b class="${realized >= 0 ? "up" : "down"}">${realized >= 0 ? "+" : "−"}${usd(Math.abs(realized))}</b></div><div><span>최대 낙폭</span><b class="down">${(Math.min(...r.rows.map(x => x.dd)) * 100).toFixed(1)}%</b></div>`;
+    const open = r.lots.filter(l => l.sellIdx === null);
+    $("hold").innerHTML = "<tr><th>매수일</th><th>매수가×수량</th><th>목표가</th><th>손절일</th><th>손익</th></tr>" + (open.length ? open.map(l => {
+      const pl = last.close / l.price - 1;
+      return `<tr><td>${md(l.buyDate)}</td><td class="num">$${l.price.toFixed(2)}×${l.qty}</td><td class="num">$${l.target.toFixed(2)}</td><td>${md(l.stopDate)}</td><td class="num ${pl >= 0 ? "up" : "down"}">${pct(pl)}</td></tr>`;
+    }).join("") : `<tr><td colspan="5" style="text-align:center;color:var(--faint)">보유 포트 없음 (전액 현금)</td></tr>`);
+    const wins = closed.filter(l => l.realized > 0).length;
+    $("histsum").textContent = closed.length ? `${closed.length}건 · 이익 ${wins} / 손실 ${closed.length - wins} · 합계 ${realized >= 0 ? "+" : "−"}${usd(Math.abs(realized))} (수수료 포함)` : "아직 판 포트가 없어요.";
+    $("hist").innerHTML = closed.length ? "<tr><th>매도일</th><th>매수→매도</th><th>구분</th><th>손익</th></tr>" + closed.slice().reverse().map(l =>
+      `<tr><td>${md(l.sellDate)}</td><td class="num">$${l.price.toFixed(2)}→$${l.sellPrice.toFixed(2)}</td><td>${l.result === "익절" ? "목표가" : "손절"}</td><td class="num ${l.realized >= 0 ? "up" : "down"}">${l.realized >= 0 ? "+" : "−"}${usd(Math.abs(l.realized))}</td></tr>`).join("") : "";
+    // 차트
+    const eq = r.rows.map(x => x.total), q = P.capital / C[s0 + 1], hold = r.rows.map((x, k) => k === 0 ? P.capital : q * C[s0 + k]);
+    const W = 360, H = 150, m = { l: 40, r: 6, t: 8, b: 18 }, all = eq.concat(hold), lo = Math.min(...all) * 0.97, hi = Math.max(...all) * 1.03, n = eq.length;
+    const X = k => m.l + (W - m.l - m.r) * (n <= 1 ? 0 : k / (n - 1)), Y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+    let g = "";
+    [lo, (lo + hi) / 2, hi].forEach(v => g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${m.l - 4}" y="${Y(v) + 3}" text-anchor="end">$${Math.round(v / 1000)}k</text>`);
+    g += `<text x="${m.l}" y="${H - 4}">${md(D[s0 + 1])}</text><text x="${W - m.r}" y="${H - 4}" text-anchor="end">${md(D[cur])}</text>`;
+    if (n > 1) {
+      g += `<path d="${hold.map((v, k) => (k ? "L" : "M") + X(k).toFixed(1) + " " + Y(v).toFixed(1)).join("")}" fill="none" stroke="var(--faint)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      g += `<path d="${eq.map((v, k) => (k ? "L" : "M") + X(k).toFixed(1) + " " + Y(v).toFixed(1)).join("")}" fill="none" stroke="var(--accent)" stroke-width="2.4"/>`;
+      g += `<circle cx="${X(n - 1)}" cy="${Y(eq[n - 1])}" r="3.5" fill="var(--accent)"/>`;
+    }
+    $("eq").innerHTML = g;
+  }
+  function begin() {
+    const s = $("start").value; let i = D.findIndex(d => d >= s); if (i < 1) i = 1;
+    s0 = i - 1; cur = i; done = {}; render();
+  }
+  $("start").onchange = begin;
+  $("reset").onclick = begin;
+  $("prev").onclick = () => { if (cur > s0 + 1) { cur--; render(); } };
+  $("next").onclick = $("advance").onclick = () => { if (cur < D.length - 1) { cur++; render(); $("s-today").scrollTop = 0; } };
+  $("toEnd").onclick = () => { cur = D.length - 1; render(); };
+  $("tickets").addEventListener("click", e => { const k = e.target.dataset && e.target.dataset.k; if (k) { done[k] = !done[k]; render(); } });
+  document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll(".screen").forEach(s => s.hidden = s.id !== b.dataset.s);
+  });
+  begin();
+})();
+</script>
+
+</html>
