@@ -1,0 +1,134 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SOXL v5 매매 규칙서</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* 레이아웃: 휴대폰 한 손으로 읽는 한 단 카드 문서. "카톡 v5 줄을 그대로 주문" 이 가장 먼저 보이게.
+   v5 는 다른 도구 화면에서 자홍색이라 같은 색을 강조색으로 쓴다. 상승 빨강·하락 파랑(국내 관례). */
+:root {
+  --bg:#f3f4f6; --surface:#ffffff; --line:#dcdfe5; --ink:#161a22; --sub:#596070; --faint:#8b92a1;
+  --accent:#b8327a; --accent-soft:#f8e6f0; --up:#d2343c; --down:#1d5fcf;
+  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-num:"Space Grotesk","IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0f1116; --surface:#171a21; --line:#2a2f3a; --ink:#e8eaef; --sub:#a7aebb; --faint:#747c8b;
+  --accent:#ff7fb9; --accent-soft:#3a1f2e; --up:#ff6b70; --down:#6ea4ff; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0f1116; --surface:#171a21; --line:#2a2f3a; --ink:#e8eaef; --sub:#a7aebb; --faint:#747c8b;
+  --accent:#ff7fb9; --accent-soft:#3a1f2e; --up:#ff6b70; --down:#6ea4ff; color-scheme:dark }
+* { box-sizing:border-box }
+body { background:var(--bg); color:var(--ink); font:17px/1.65 var(--f-body) }
+main { max-width:640px; margin:0 auto; padding-block:28px 72px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid; gap:30px }
+.num { font-family:var(--f-num); font-variant-numeric:tabular-nums }
+.eyebrow { font-size:12px; letter-spacing:.08em; color:var(--accent); font-weight:700 }
+h1 { margin:4px 0 8px; font-size:28px; line-height:1.25; text-wrap:balance }
+h2 { margin:0 0 10px; font-size:20px; text-wrap:balance }
+p { margin:0 } .sub { color:var(--sub) } .small { font-size:14px; color:var(--faint) }
+section { display:grid; gap:10px; min-width:0 }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; display:grid; gap:10px }
+.hero { border:2px solid var(--accent); background:var(--accent-soft) }
+.kakao { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:15px; line-height:1.6; white-space:pre-line }
+.kakao b { color:var(--accent) }
+ol.steps { margin:0; padding:0; list-style:none; counter-reset:n; display:grid; gap:8px }
+ol.steps li { counter-increment:n; display:grid; grid-template-columns:28px 1fr; gap:10px; align-items:start }
+ol.steps li::before { content:counter(n); width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--surface); font:700 13px/26px var(--f-num); text-align:center }
+.rules { display:grid; gap:8px }
+.rule { display:grid; grid-template-columns:96px 1fr; gap:12px; align-items:baseline; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px }
+.rule .k { font-weight:700 } .rule .k small { display:block; font-weight:400; font-size:12px; color:var(--faint) }
+.rule.new .k { color:var(--accent) }
+.money { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; text-align:center }
+.money div { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 6px; display:grid; gap:2px }
+.money b { font-family:var(--f-num); font-size:20px } .money span { font-size:13px; color:var(--sub) }
+.money .on { border-color:var(--accent); background:var(--accent-soft) }
+.tw { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface) }
+table { border-collapse:collapse; width:100%; font-size:15px }
+th, td { padding:9px 10px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap }
+th { font-weight:500; color:var(--sub); font-size:13px }
+th:first-child, td:first-child { text-align:left } tr:last-child td { border-bottom:0 }
+td.v5 { font-weight:700; color:var(--accent) }
+ul.plain { margin:0; padding-left:20px; display:grid; gap:4px; color:var(--sub) }
+footer { font-size:12px; color:var(--faint) }
+@media (max-width:420px) { h1 { font-size:24px } .rule { grid-template-columns:80px 1fr } }
+</style>
+
+</head><body><main>
+  <header>
+    <div class="eyebrow">떨사오팔 · 주 공식</div>
+    <h1>SOXL v5 매매 규칙서</h1>
+    <p class="sub">기존 떨사오팔(7포트, 떨어지면 사고 오르면 판다)에서 세 가지만 바꿨습니다. 계산은 카톡과 계산기가 해 주니, 나오는 숫자대로 주문만 넣으면 됩니다.</p>
+  </header>
+
+  <section class="card hero">
+    <h2>매일 하는 일은 이것뿐</h2>
+    <ol class="steps">
+      <li><div>아침 8:50 카톡의 <b>v5</b> 줄을 봅니다.</div></li>
+      <li><div>나온 가격과 수량 그대로 증권사 앱에 주문합니다. 매수·매도는 <b>LOC</b>, 손절은 <b>MOC</b>.</div></li>
+      <li><div>체결되면 포트 계산기에 적습니다. 다음 날 주문은 또 카톡으로 옵니다.</div></li>
+    </ol>
+    <div class="kakao">[SOXL] 11/24(화) <b>v5: 매수 43.20×57</b>
+<b>v5 의견: 매수 (금액 1/4)</b>
+매수 43.20 이하 마감 시 57주
+v5 계좌 $70,000 (+0.0%) · 0/7포트</div>
+    <p class="small">위 카톡이면: 앱에서 SOXL <b>LOC 매수 43.20달러, 57주</b>. 그날 종가가 43.20 이하면 사지고, 아니면 안 사집니다.</p>
+  </section>
+
+  <section>
+    <h2>규칙 (기존과 다른 건 색으로 표시)</h2>
+    <div class="rules">
+      <div class="rule"><span class="k">사는 날<small>기존과 같음</small></span><span>오늘 종가가 어제 종가보다 낮게 마감하면 한 포트 삽니다.</span></div>
+      <div class="rule new"><span class="k">파는 날<small>기존: 산 값</small></span><span>산 값보다 <b>10%</b> 오른 값 이상으로 마감하면 그 포트를 팝니다.</span></div>
+      <div class="rule new"><span class="k">손절<small>기존: 30일</small></span><span>산 날부터 <b>10거래일</b>째 되는 날 종가에 무조건 팝니다.</span></div>
+      <div class="rule new"><span class="k">약세장<small>새로 추가</small></span><span>반도체지수가 200일 평균보다 낮으면 그 포트에서 <b>1/4만</b> 삽니다.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>"1/4만 산다"는 이런 뜻 (단위는 달러)</h2>
+    <div class="money num">
+      <div><b>$70,000</b><span>시작 돈</span></div>
+      <div><b>$10,000</b><span>한 포트 (÷7)</span></div>
+      <div class="on"><b>$2,500</b><span>약세장에서 실제 매수</span></div>
+    </div>
+    <p class="sub">쓰지 않은 7,500달러는 현금으로 남아 다음 매수 때 다시 나눠 씁니다. 따로 관리할 필요 없습니다. 반도체지수가 200일 평균 위로 올라오면 다시 한 포트를 다 삽니다.</p>
+    <p class="small">이 계산은 카톡과 포트 계산기가 수량까지 다 해서 알려 줍니다.</p>
+  </section>
+
+  <section>
+    <h2>왜 이렇게 바꿨나</h2>
+    <ul class="plain">
+      <li><b>손절 10일</b>: 비싸게 산 포트를 30일씩 끌고 가다 크게 잃는 일이 기존 공식의 가장 큰 손실 원인이었습니다.</li>
+      <li><b>+10%에 팔기</b>: 손절을 짧게 한 만큼 이익은 크게 가져갑니다.</li>
+      <li><b>약세장 1/4</b>: 아예 안 사면 떨어진 뒤 반등을 놓쳤고, 조금만 사는 쪽이 결과가 가장 좋았습니다.</li>
+      <li>1994~2019년 자료로 고르고, 고를 때 보지 않은 2020~2026년으로 확인했습니다.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>7만 달러로 시작했다면 (2026-11-23 기준)</h2>
+    <div class="tw"><table>
+      <tr><th>시작</th><th>v5</th><th>기존 공식</th><th>그냥 보유</th></tr>
+      <tr><td>2022년 1월</td><td class="v5 num">$239,704</td><td class="num">$131,100</td><td class="num">$41,868</td></tr>
+      <tr><td>2020년 1월</td><td class="v5 num">$514,081</td><td class="num">$363,872</td><td class="num">$155,121</td></tr>
+      <tr><td>2010년 1월</td><td class="v5 num">$2,220,681</td><td class="num">$1,716,150</td><td class="num">$4,019,262</td></tr>
+      <tr><td>가장 크게 빠졌을 때</td><td class="v5 num">−45%</td><td class="num">−75%</td><td class="num">−91%</td></tr>
+    </table></div>
+    <p class="small">수수료 0.2%. "가장 크게 빠졌을 때"(최대 낙폭)는 2010년 이후 기준. 2010년 3월 이전은 반도체지수로 만든 합성 가격입니다.</p>
+  </section>
+
+  <section>
+    <h2>알고 따르세요</h2>
+    <ul class="plain">
+      <li>폭락이 시작될 때는 지수가 아직 200일 평균 위라 1/4 축소가 늦게 걸립니다. 2026년 10월처럼 손절이 연달아 나올 수 있습니다.</li>
+      <li>강세장이 길면 기존 공식이나 그냥 보유보다 덜 벌 때가 있습니다.</li>
+      <li>1994년부터 이어 굴리면 금융위기 때 계좌가 −80%까지 빠졌습니다. 과거 결과는 앞으로를 보장하지 않습니다.</li>
+    </ul>
+  </section>
+
+  <footer>모의 운영용 자료입니다. 투자 권유가 아닙니다.</footer>
+</main>
+
+</body></html>
