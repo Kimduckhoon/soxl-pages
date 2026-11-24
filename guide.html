@@ -5,13 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SOXL 도구 사용방법</title>
 <style>
-  /* 한 화면에 하나씩: 큰 버튼 → 매일 할 일 → 도구별 3~4단계. 기존 안내 페이지와 같은 밝은 색 */
   :root { --bg:#f4f2ee; --card:#fff; --ink:#1f1e1c; --sub:#6b6862; --line:#dedad2; --acc:#c96442; --hi:#fff3c4; color-scheme:light; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 "Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
   main { max-width:560px; margin:0 auto; padding-block:28px 64px; padding-left:max(18px, env(safe-area-inset-left, 0px)); padding-right:max(18px, env(safe-area-inset-right, 0px)); }
   h1 { font-size:24px; margin:0 0 18px; }
-  h2 { font-size:19px; margin:36px 0 10px; }
+  h2 { font-size:19px; margin:32px 0 10px; }
   .go { display:grid; gap:10px; }
   .go a { display:block; background:var(--acc); color:#fff; text-decoration:none; font-weight:700; border-radius:12px; padding:14px 16px; }
   .go a span { display:block; font-weight:400; font-size:14px; opacity:.9; }
@@ -20,6 +19,11 @@
   ol li { counter-increment:n; display:grid; grid-template-columns:28px 1fr; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
   ol li::before { content:counter(n); width:26px; height:26px; border-radius:50%; background:var(--ink); color:#fff; font:700 13px/26px sans-serif; text-align:center; }
   b.k { background:var(--hi); padding:0 5px; border-radius:4px; }
+  .s { color:var(--sub); font-size:15px; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:15px; }
+  th, td { padding:9px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+  th { background:#faf8f4; font-size:13px; color:var(--sub); font-weight:400; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; font-size:14px; white-space:pre-wrap; margin:0; }
   .tip { color:var(--sub); font-size:15px; margin:10px 0 0; }
   details { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-top:8px; }
   summary { cursor:pointer; font-weight:700; }
@@ -32,47 +36,47 @@
   <h1>SOXL 도구 사용방법</h1>
 
   <div class="go">
-    <a href="https://kimduckhoon.github.io/soxl-pages/paper.html">모의투자<span>연습으로 사고팔고 기록하기</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/simulator.html">과거 시뮬레이터<span>그때 시작했다면 얼마였을까</span></a>
-    <a class="plain" href="https://drive.google.com/">실전 매매일지 (구글 드라이브)<span>드라이브에서 "SOXL 떨사오팔 실전 매매일지" 열기</span></a>
+    <a href="https://kimduckhoon.github.io/soxl-pages/calc.html">포트 계산기<span>산 가격만 넣으면 매도 시점·다음 매수가가 자동으로</span></a>
+    <a class="plain" href="https://kimduckhoon.github.io/soxl-pages/paper.html">모의투자<span>연습으로 사고팔고 기록하기</span></a>
+    <a class="plain" href="https://kimduckhoon.github.io/soxl-pages/simulator.html">과거 시뮬레이터<span>그때 시작했다면 얼마였을까</span></a>
+    <a class="plain" href="https://drive.google.com/">실전 매매일지 (구글 드라이브)<span>"SOXL 떨사오팔 실전 매매일지" 열기</span></a>
   </div>
 
-  <h2>매일 할 일</h2>
-  <ol>
-    <li><div>아침 8:50 카톡에 <b>내일 주문</b>이 옵니다<br><span style="color:var(--sub);font-size:15px">예: P2 매도 47.52×231 (이 가격 이상으로 마감하면 매도), P3 매수 43.20×100 (이 가격 이하로 마감하면 매수), MOC = 손절일이라 종가에 무조건 매도</span></div></li>
-    <li><div>자세한 이유는 <b class="k">리포트 보기</b></div></li>
-    <li><div>살지, 팔지, 쉴지 정하기</div></li>
-    <li><div>연습이면 <b>모의투자</b>에, 실제로 샀으면 <b>매매일지</b>에 적기</div></li>
-  </ol>
-  <p class="tip">종가는 아침 7:30쯤 자동으로 들어옵니다. 따로 할 일 없어요.</p>
+  <h2>세 공식</h2>
+  <table>
+    <tr><th>공식</th><th>규칙</th><th>잘 맞는 때</th></tr>
+    <tr><td><b>기존</b></td><td>손절 30일 · 산 값에 팔기</td><td>평소 장. 수익이 가장 큼</td></tr>
+    <tr><td><b>v4</b></td><td>손절 5일 · +10%에 팔기</td><td>폭락장. 손실을 빨리 끊음</td></tr>
+    <tr><td><b>v5</b></td><td>손절 10일 · +10%에 팔기 · 반도체지수가 200일선 아래면 1/4만 사기</td><td>그 중간</td></tr>
+  </table>
+  <p class="tip">셋 다 7포트, 하루에 한 포트씩 삽니다. 어느 공식을 따를지는 직접 정하세요.</p>
 
-  <h2>모의투자</h2>
-  <ol>
-    <li><div>"공식 주문"에서 <b class="k">폼에 채우기</b> 누르기</div></li>
-    <li><div>체결가를 <b>그날 실제 종가</b>로 고치기</div></li>
-    <li><div><b class="k">기록하기</b> → 위쪽에서 "내 계좌 vs 공식" 비교</div></li>
+  <h2>아침 8:50 카톡 읽는 법</h2>
+  <pre>기존: 매수 43.20×100 · 매도대기 2 · 손절 110주
+v4: 매수 43.20×231
+v5: 매수 43.20×57 (SOX 200일선 아래 → 매수금 25%)</pre>
+  <ol style="margin-top:8px">
+    <li><div><b>매수 43.20×100</b> = 오늘 밤 종가가 43.20 이하로 마감하면 100주 사기 (LOC)</div></li>
+    <li><div><b>매도대기</b> = 목표가 이상으로 마감하면 팔릴 포트 수 (LOC)</div></li>
+    <li><div><b>손절</b> = 손절일이 된 포트, 종가에 무조건 팔기 (MOC)</div></li>
   </ol>
-  <p class="tip">기록은 휴대폰 브라우저에 저장돼요. 늘 같은 브라우저(크롬)로 여세요.</p>
+  <p class="tip">자세한 근거는 카톡의 <b class="k">리포트 보기</b>.</p>
 
-  <h2>실전 매매일지</h2>
+  <h2>포트 계산기</h2>
   <ol>
-    <li><div>환전하면 <b>입출금·환전</b> 탭에 한 줄<br><span style="color:var(--sub);font-size:15px">날짜, 원화 금액, 환율, 받은 달러</span></div></li>
-    <li><div>체결되면 <b>매매일지</b> 탭에 한 줄 (날짜 순서대로)<br><span style="color:var(--sub);font-size:15px">날짜, 포트 번호(1~7), 매수/매도, 체결가, 수량, 수수료</span></div></li>
-    <li><div><b class="k">노란 칸만</b> 적으면 목표가·손절일·손익은 자동</div></li>
-    <li><div><b>현황</b> 탭에서 예수금, 다음 1회 매수금, 손절일 확인</div></li>
+    <li><div>현금(달러)을 적고, <b>산 포트만</b> 매수일·매수가·수량을 적기</div></li>
+    <li><div>공식별로 <b>목표가</b>(이 값 이상 마감 시 매도)와 <b>손절일</b>이 바로 나옴</div></li>
+    <li><div>아래에 <b>다음 매수가·수량</b>이 공식별로 나옴</div></li>
+    <li><div>팔면 그 포트 칸을 지우고, 새로 사면 빈 칸에 적기</div></li>
   </ol>
-  <p class="tip">팔 때는 산 포트 번호를 그대로 적어요. 수수료는 앱에 찍힌 금액 그대로.</p>
-  <p class="tip">매매일지에 적어 두면 다음 날 아침 카톡에 <b>포트별 주문</b>(보유 포트는 매도 가격·손절일, 빈 포트는 매수 가격·수량)이 옵니다. 계산 규칙은 <b>설정</b> 탭의 값(분할 수·손절일·목표율)을 따릅니다. 밤사이 적은 내용은 다음 날 아침 7:30 수집 때 반영돼요.</p>
+  <p class="tip">종가는 매일 아침 7:30쯤 자동 갱신. 적은 내용은 휴대폰에만 저장돼요.</p>
 
-  <h2>과거 시뮬레이터</h2>
-  <ol>
-    <li><div>시작일·투자금 넣기 (또는 <b class="k">최근 1년</b> 같은 버튼)</div></li>
-    <li><div>그래프를 손가락으로 밀면 그날 금액이 보여요</div></li>
-  </ol>
+  <h2>실전 매매일지 (선택)</h2>
+  <p class="s" style="margin:0">체결될 때마다 <b>매매일지</b> 탭에 한 줄(날짜, 포트 1~7, 매수/매도, 체결가, 수량, 수수료). 그러면 다음 날 카톡 맨 위에 <b>내 계좌 포트별 주문</b>이 같이 옵니다. 계산 규칙은 <b>설정</b> 탭을 따릅니다(v4로 하려면 손절 5, 매도 목표율 0.1).</p>
 
   <h2>안 될 때</h2>
-  <details><summary>리포트가 404로 떠요</summary><p>화면의 sign in을 눌러 GitHub에 로그인하세요. 한 번 하면 다음부터 바로 열려요.</p></details>
-  <details><summary>모의투자 기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 크롬으로 다시 열어 보세요. 모의투자 맨 아래 "기록 백업"으로 미리 복사해 두면 되살릴 수 있어요.</p></details>
+  <details><summary>리포트가 404로 떠요</summary><p>sign in을 눌러 GitHub에 로그인하세요. 한 번 하면 다음부터 바로 열려요.</p></details>
+  <details><summary>계산기·모의투자 기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 늘 같은 브라우저(크롬)로 여세요.</p></details>
   <details><summary>오늘 종가가 안 보여요</summary><p>아침 7:30 이후에 새로고침하세요. 주말·미국 휴장일 다음 날은 바뀌지 않아요.</p></details>
 
   <p class="foot">모의 운영용 도구입니다. 투자 권유가 아니며, 과거 결과가 미래 수익을 보장하지 않습니다.</p>
