@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SOXL v5">
+<meta name="theme-color" content="#b8327a">
+<title>SOXL v5</title>
+<style>
+  /* 앱 틀: 위 얇은 제목줄 + 가운데 화면(도구 페이지) + 아래 탭 6개. 탭마다 화면을 하나씩 만들어 두고 숨겼다 보였다 해서
+     계산기 입력·연습 진행 상황이 탭을 바꿔도 그대로 남는다. 모든 도구는 같은 사이트라 저장 기록도 그대로 쓴다. */
+  :root { --bg:#f4f5f8; --bar:#ffffff; --line:#dfe2e8; --ink:#161a22; --faint:#8d94a3; --accent:#b8327a; color-scheme:light; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111318; --bar:#191c23; --line:#2b303b; --ink:#e9ebf0; --faint:#757d8c; --accent:#ff7fb9; color-scheme:dark; } }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { background:var(--bg); color:var(--ink); font:14px/1.4 "IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    display:grid; grid-template-rows:auto 1fr auto; height:100dvh; }
+  header { background:var(--bar); border-bottom:1px solid var(--line); padding:calc(env(safe-area-inset-top,0px) + 8px) max(14px, env(safe-area-inset-right,0px)) 8px max(14px, env(safe-area-inset-left,0px));
+    display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  header b { font-size:15px; } header b span { color:var(--accent); }
+  header a { color:var(--faint); font-size:12px; text-decoration:none; border:1px solid var(--line); border-radius:8px; padding:3px 8px; }
+  .stage { position:relative; min-height:0; }
+  .stage iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:var(--bg); }
+  .stage iframe[hidden] { display:none; }
+  nav { background:var(--bar); border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(6,1fr);
+    padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px); }
+  nav button { border:0; background:none; color:var(--faint); font:inherit; font-size:11px; padding:8px 2px 10px; display:grid; justify-items:center; gap:3px; cursor:pointer; }
+  nav button svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  nav button[aria-selected="true"] { color:var(--accent); font-weight:700; }
+  nav button:focus-visible { outline:2px solid var(--accent); outline-offset:-4px; border-radius:8px; }
+</style>
+</head>
+<body>
+  <header><b>SOXL <span>v5</span></b><a href="https://github.com/Kimduckhoon/soxl-ai/issues" target="_blank" rel="noopener">오늘 리포트</a></header>
+  <main class="stage" id="stage"></main>
+  <nav role="tablist" aria-label="도구">
+    <button role="tab" data-id="practice" data-src="practice.html"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 15l5-5 4 3 7-7"/></svg>실전 연습</button>
+    <button role="tab" data-id="calc" data-src="calc.html"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h2M12 18h2"/></svg>계산기</button>
+    <button role="tab" data-id="paper" data-src="paper.html"><svg viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6M15 4v4h4"/></svg>모의투자</button>
+    <button role="tab" data-id="sim" data-src="simulator.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>과거</button>
+    <button role="tab" data-id="v5" data-src="v5.html"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>규칙서</button>
+    <button role="tab" data-id="guide" data-src="guide.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h0"/></svg>사용법</button>
+  </nav>
+<script>
+(function () {
+  var stage = document.getElementById("stage"), tabs = [].slice.call(document.querySelectorAll("nav button")), frames = {};
+  function show(id) {
+    var b = tabs.filter(function (x) { return x.dataset.id === id; })[0] || tabs[0];
+    id = b.dataset.id;
+    if (!frames[id]) {                       // 처음 누를 때 한 번만 불러온다
+      var f = document.createElement("iframe");
+      f.src = b.dataset.src; f.title = b.textContent.trim(); f.setAttribute("loading", "eager");
+      stage.appendChild(f); frames[id] = f;
+      f.addEventListener("load", function () {   // 화면 안의 다른 도구 링크는 아래 탭으로 이동
+        try {
+          f.contentDocument.addEventListener("click", function (e) {
+            var a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+            var u = new URL(a.href, f.contentWindow.location.href);
+            if (u.origin !== location.origin) return;
+            if (u.pathname.split("/").pop() === "app.html") { e.preventDefault(); return; }   // 앱 안에서 앱을 또 열지 않음
+            var t = tabs.filter(function (x) { return u.pathname.split("/").pop() === x.dataset.src; })[0];
+            if (t) { e.preventDefault(); show(t.dataset.id); }
+          });
+        } catch (err) {}
+      });
+    }
+    Object.keys(frames).forEach(function (k) { frames[k].hidden = k !== id; });
+    tabs.forEach(function (x) { x.setAttribute("aria-selected", x === b); });
+    if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+    try { localStorage.setItem("soxl-app-tab", id); } catch (e) {}
+  }
+  tabs.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.id); }); });
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1)); });
+  var start = location.hash.slice(1);
+  if (!start) { try { start = localStorage.getItem("soxl-app-tab") || ""; } catch (e) {} }
+  show(start || "practice");
+})();
+</script>
+</body>
+</html>
