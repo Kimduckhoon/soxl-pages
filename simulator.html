@@ -147,7 +147,8 @@
     }
     return iso(d);
   }
-  // p: {capital, splits, stopDays, fee, buyPct, sellPct}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
+  // p: {capital, splits, stopDays, fee, buyPct, sellPct, scale?}  (fee, buyPct, sellPct 는 소수: 0.002 = 0.2%)
+  // scale: 날짜별 1회 매수금 비율 배열(선택, 기본 1). t 종가에 내는 다음 날 매수 주문에 적용
   function simulate(dates, closes, holidays, p) {
     var cash = p.capital, open = [], lots = [], rows = [];
     var prevI = null, prevJ = 0, prevHeld = 0, cumCost = 0, shares = 0, avg = 0, peak = -Infinity, fees = 0;
@@ -182,7 +183,7 @@
       var held = open.length;
       var H = held === p.splits ? null : cash / (p.splits - held);
       var I = rounddown2(F * (1 + p.buyPct) - 1e-9);
-      var J = H === null ? 0 : Math.floor(H / I);
+      var J = H === null ? 0 : Math.floor(H * (p.scale ? p.scale[t] : 1) / I);   // scale: v5 의 지수 약세 시 1회 매수금 비율
       var total = shares * F + cash;
       if (total > peak) peak = total;
       rows.push({ date: d, close: F, held: held, shares: shares, avg: avg, cash: cash, total: total,
