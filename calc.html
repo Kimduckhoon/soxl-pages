@@ -29,6 +29,16 @@
   .tip { color:var(--sub); font-size:13px; margin:8px 0 0; }
   button { font:inherit; font-size:14px; border:1px solid var(--line); background:var(--card); border-radius:8px; padding:6px 10px; }
   a { color:var(--acc); }
+  button.sold { margin-top:5px; padding:3px 7px; font-size:12px; background:var(--hi); }
+  .gain { color:var(--up); } .loss { color:var(--dn); }
+  #hist td button { padding:2px 7px; font-size:12px; }
+  dialog { border:1px solid var(--line); border-radius:14px; padding:16px; width:min(92vw,360px); }
+  dialog::backdrop { background:rgba(0,0,0,.35); }
+  dialog label { display:block; font-size:14px; margin:8px 0 3px; }
+  dialog .chk { display:flex; gap:8px; align-items:center; margin-top:12px; font-size:14px; }
+  dialog .chk input { width:auto; }
+  dialog .btns { display:flex; gap:8px; justify-content:flex-end; margin-top:14px; }
+  dialog .btns .ok { background:var(--acc); color:#fff; border-color:var(--acc); }
 </style>
 <main>
   <h1>SOXL 포트 계산기</h1>
@@ -41,7 +51,7 @@
       <div class="row head"><span></span><span>매수일 (미국)</span><span>매수가 ($)</span><span>수량</span></div>
       <div id="ports"></div>
     </div>
-    <p class="tip">빈칸 = 빈 포트. 적은 내용은 이 휴대폰에 저장됩니다. <button id="clear" type="button">모두 지우기</button></p>
+    <p class="tip">빈칸 = 빈 포트. 팔았으면 아래 표의 <b>팔았음</b>을 누르세요(기록이 남고 칸이 비워져요). 적은 내용은 이 휴대폰에 저장됩니다. <button id="clear" type="button">포트 칸 비우기</button></p>
   </div>
 
   <h2>공식별 매도 시점</h2>
@@ -51,6 +61,19 @@
   <h2 id="buyh">다음 매수</h2>
   <div class="card"><table id="buy"></table>
     <p class="tip">하루에 한 포트씩. 내일 종가가 매수가 이하로 마감하면 체결(LOC). 그다음 매수가는 매일 전날 종가로 새로 정해져서, 아침 카톡과 이 화면에 다시 나옵니다.</p></div>
+
+  <h2>매도 기록</h2>
+  <div class="card"><p id="histsum" style="margin:0 0 6px;font-weight:700"></p><table id="hist"></table>
+    <p class="tip"><button id="backup" type="button">기록 백업(복사)</button> <button id="restore" type="button">백업 붙여넣기</button> 다른 휴대폰·브라우저로 옮길 때 씁니다.</p></div>
+
+  <dialog id="sd"><form method="dialog">
+    <b id="sdt"></b>
+    <label>매도일 (미국)<input type="date" id="s_d"></label>
+    <label>매도가 ($)<input type="number" inputmode="decimal" step="0.01" id="s_p"></label>
+    <label>수량<input type="number" inputmode="numeric" id="s_q"></label>
+    <div class="chk"><input type="checkbox" id="s_c" checked><span>매도 금액을 위 현금에 더하기</span></div>
+    <div class="btns"><button value="cancel">취소</button><button value="ok" class="ok" id="s_ok">기록하고 포트 비우기</button></div>
+  </form></dialog>
 
   <p class="tip" style="margin-top:22px"><a href="guide.html">사용방법</a> · 모의 운영용 계산기입니다. 투자 권유가 아닙니다.</p>
 </main>
@@ -77,6 +100,7 @@ $("base").textContent = `기준: ${md(D.date)} 종가 $${D.close.toFixed(2)} · 
 const KEY = "soxl-calc-v1";
 const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
 $("cash").value = saved.cash ?? "";
+let hist = saved.hist || [];
 $("ports").innerHTML = [...Array(7)].map((_,i)=>`<div class="row" style="margin-top:6px"><span class="n">P${i+1}</span>
   <input type="date" data-i="${i}" data-f="d"><input type="number" inputmode="decimal" step="0.01" data-i="${i}" data-f="p">
   <input type="number" inputmode="numeric" data-i="${i}" data-f="q"></div>`).join("");
@@ -85,7 +109,7 @@ document.querySelectorAll("#ports input").forEach(el=>{ const p=(saved.ports||[]
 function read(){
   const ports=[...Array(7)].map(()=>({}));
   document.querySelectorAll("#ports input").forEach(el=>{ ports[el.dataset.i][el.dataset.f]=el.value; });
-  localStorage.setItem(KEY, JSON.stringify({cash:$("cash").value, ports}));
+  localStorage.setItem(KEY, JSON.stringify({cash:$("cash").value, ports, hist}));
   return {cash: parseFloat($("cash").value)||0, ports};
 }
 function render(){
@@ -96,7 +120,7 @@ function render(){
   if(!held.length) h += `<tr><td colspan="4" class="sub">아직 산 포트가 없습니다.</td></tr>`;
   for(const p of held){
     const pnl = (D.close/p.price-1)*100;
-    h += `<tr><td><b>P${p.i+1}</b><span class="sub">${p.price.toFixed(2)}${p.qty?` ×${p.qty}`:""}<br>${pnl>=0?"+":""}${pnl.toFixed(1)}%</span></td>`;
+    h += `<tr><td><b>P${p.i+1}</b><span class="sub">${p.price.toFixed(2)}${p.qty?` ×${p.qty}`:""}<br>${pnl>=0?"+":""}${pnl.toFixed(1)}%</span><button class="sold" type="button" data-sell="${p.i}">팔았음</button></td>`;
     for(const f of F){
       const tgt = r2(p.price*(1+f.sell)), stop = addBiz(p.d, f.stop);
       if(stop <= D.next) h += `<td class="moc">${stop < D.next ? "손절일 지남" : "내일 손절"}<span class="sub">종가에 MOC 매도</span></td>`;
@@ -116,9 +140,42 @@ function render(){
       <td><b>${cash?q:"-"}</b><span class="sub">${cash&&free?`1회 매수금 $${money(budget)}${f.scale()<1?" (지수 약세 1/4)":""}`:"현금을 적으면 수량이 나와요"}</span></td></tr>`;
   }
   $("buy").innerHTML = b;
+  // 매도 기록
+  const tot = hist.reduce((s,r)=>s+r.pnl,0), win = hist.filter(r=>r.pnl>0).length;
+  $("histsum").innerHTML = hist.length ? `실현 손익 <span class="${tot>=0?"gain":"loss"}">${tot>=0?"+":"-"}$${money(Math.abs(tot))}</span> · ${hist.length}건 (이익 ${win} / 손실 ${hist.length-win}) <span class="sub" style="display:inline">수수료 제외</span>` : "";
+  $("hist").innerHTML = hist.length ? `<tr><th style="width:62px">매도일</th><th style="width:34px">포트</th><th>매수 → 매도</th><th style="width:92px">손익</th><th style="width:30px"></th></tr>` +
+    hist.map((r,k)=>`<tr><td>${md(r.sd)}</td><td>P${r.port}</td><td>${r.bp.toFixed(2)} → ${r.sp.toFixed(2)}<span class="sub">×${r.q} · ${md(r.bd)} 매수</span></td>
+      <td class="${r.pnl>=0?"gain":"loss"}"><b>${r.pnl>=0?"+":"-"}$${money(Math.abs(r.pnl))}</b><span class="sub">${r.pnl>=0?"+":""}${(r.pct*100).toFixed(1)}%</span></td>
+      <td><button type="button" data-del="${k}" aria-label="삭제">×</button></td></tr>`).join("")
+    : `<tr><td class="sub">아직 매도 기록이 없습니다.</td></tr>`;
 }
+// 팔았음 -> 매도 기록 창
+let selling = null;
+document.addEventListener("click", e => {
+  const s = e.target.dataset.sell, del = e.target.dataset.del;
+  if (s !== undefined) {
+    const p = read().ports[s]; selling = +s;
+    $("sdt").textContent = `P${selling+1} 매도 기록 (매수 ${p.d} · ${p.p}${p.q?` ×${p.q}`:""})`;
+    $("s_d").value = D.date; $("s_p").value = D.close.toFixed(2); $("s_q").value = p.q || "";
+    $("sd").showModal();
+  }
+  if (del !== undefined && confirm("이 매도 기록을 지울까요? (현금은 바뀌지 않아요)")) { hist.splice(+del, 1); render(); }
+});
+$("sd").addEventListener("close", () => {
+  if ($("sd").returnValue !== "ok" || selling === null) return;
+  const p = read().ports[selling], bp = parseFloat(p.p), sp = parseFloat($("s_p").value), q = parseInt($("s_q").value) || 0;
+  if (!(sp > 0) || !(q > 0)) { alert("매도가와 수량을 적어 주세요."); return; }
+  hist.unshift({port: selling+1, bd: p.d, bp, q, sd: $("s_d").value || D.date, sp, pnl: (sp-bp)*q, pct: sp/bp-1});
+  if ($("s_c").checked) $("cash").value = r2((parseFloat($("cash").value)||0) + sp*q);
+  document.querySelectorAll(`#ports input[data-i="${selling}"]`).forEach(el => el.value = "");
+  selling = null; render();
+});
+$("backup").onclick = async () => { const txt = localStorage.getItem(KEY) || "{}";
+  try { await navigator.clipboard.writeText(txt); alert("복사했어요. 메모장이나 카톡 나에게 보내기에 붙여넣어 두세요."); } catch { prompt("아래 글을 길게 눌러 복사하세요", txt); } };
+$("restore").onclick = () => { const txt = prompt("백업해 둔 글을 붙여넣으세요"); if (!txt) return;
+  try { JSON.parse(txt); localStorage.setItem(KEY, txt); location.reload(); } catch { alert("백업 글이 아니에요."); } };
 document.addEventListener("input", render);
-$("clear").onclick = () => { if(confirm("입력한 포트를 모두 지울까요?")){ localStorage.removeItem(KEY); location.reload(); } };
+$("clear").onclick = () => { if(confirm("포트 칸을 모두 비울까요? (매도 기록과 현금은 남아요)")){ document.querySelectorAll("#ports input").forEach(el=>el.value=""); render(); } };
 render();
 </script>
 
