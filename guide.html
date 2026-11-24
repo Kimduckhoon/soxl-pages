@@ -5,120 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SOXL 도구 사용방법</title>
 <style>
-  /* 한 단, 위에서부터: 바로가기 → 매일 할 일(v5) → 카톡 읽는 법 → 도구 → 용어. v5 강조색은 다른 화면과 같은 자홍색 */
-  :root { --bg:#f4f2ee; --card:#fff; --ink:#1f1e1c; --sub:#6b6862; --line:#dedad2; --acc:#b8327a; --acc-soft:#f8e6f0; --hi:#fff3c4; color-scheme:light; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#141312; --card:#1d1c1a; --ink:#ecebe7; --sub:#aaa69e; --line:#34322e; --acc:#ff7fb9; --acc-soft:#3a1f2e; --hi:#4a4220; color-scheme:dark; } }
+  /* 한 단: 앱 열기 → 매일 아침 2단계(화면 모양 그대로) → 어디서 하나 → 처음 시작 → 카톡 → v5 한 줄 → 자주 묻는 것 → 참고.
+     ① 초록 = 어젯밤 결과 반영, ② 자홍 = 오늘 밤 주문 (도구 화면과 같은 색) */
+  :root { --bg:#f4f2ee; --card:#fff; --ink:#1f1e1c; --sub:#6b6862; --line:#dedad2; --acc:#b8327a; --acc-soft:#f8e6f0; --ok:#1f7a4d; --hi:#fff3c4; --up:#d2343c; --dn:#1d5fcf; color-scheme:light; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141312; --card:#1d1c1a; --ink:#ecebe7; --sub:#aaa69e; --line:#34322e; --acc:#ff7fb9; --acc-soft:#3a1f2e; --ok:#4cc38a; --hi:#4a4220; --up:#ff6b70; --dn:#6ea4ff; color-scheme:dark; } }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 "Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
-  main { max-width:560px; margin:0 auto; padding-block:28px 64px; padding-left:max(18px, env(safe-area-inset-left, 0px)); padding-right:max(18px, env(safe-area-inset-right, 0px)); }
-  h1 { font-size:24px; margin:0 0 18px; }
-  h2 { font-size:19px; margin:32px 0 10px; }
-  .go { display:grid; gap:10px; }
-  .go a { display:block; background:var(--card); color:var(--ink); border:1px solid var(--line); text-decoration:none; font-weight:700; border-radius:12px; padding:13px 16px; }
-  .go a.main { background:var(--acc); color:#fff; border-color:var(--acc); }
-  .go a span { display:block; font-weight:400; font-size:14px; opacity:.85; }
-  ol { margin:0; padding:0; list-style:none; counter-reset:n; display:grid; gap:8px; }
-  ol li { counter-increment:n; display:grid; grid-template-columns:28px 1fr; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
-  ol li::before { content:counter(n); width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--bg); font:700 13px/26px sans-serif; text-align:center; }
-  .box { background:var(--acc-soft); border:2px solid var(--acc); border-radius:12px; padding:13px 15px; display:grid; gap:8px; }
-  pre { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; font:14px/1.6 "Malgun Gothic","Apple SD Gothic Neo",sans-serif; white-space:pre-wrap; margin:0; }
-  pre b { color:var(--acc); }
+  main { max-width:560px; margin:0 auto; padding-block:26px 64px; padding-left:max(18px, env(safe-area-inset-left, 0px)); padding-right:max(18px, env(safe-area-inset-right, 0px)); display:grid; gap:12px; }
+  h1 { font-size:24px; margin:0; }
+  h2 { font-size:19px; margin:22px 0 2px; }
+  p { margin:0; } .s { color:var(--sub); font-size:15px; } .xs { color:var(--sub); font-size:13px; }
+  a.app { display:block; background:var(--acc); color:#fff; text-decoration:none; font-weight:700; border-radius:14px; padding:15px 16px; }
+  a.app span { display:block; font-weight:400; font-size:14px; opacity:.9; }
+  .step { border-radius:14px; padding:14px; display:grid; gap:8px; background:var(--card); }
+  .step.one { border:2px solid var(--ok); } .step.two { border:2px solid var(--acc); }
+  .step .no { font-size:13px; font-weight:700; } .one .no { color:var(--ok); } .two .no { color:var(--acc); }
+  .step h3 { margin:0; font-size:17px; }
+  .mock { border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); display:grid; gap:6px; font-size:14px; }
+  .mock .row { display:flex; gap:8px; align-items:center; }
+  .box { width:16px; height:16px; border-radius:4px; background:var(--ok); flex:none; }
+  .tag { font-size:11px; font-weight:700; color:#fff; padding:2px 7px; border-radius:5px; flex:none; }
+  .tag.b { background:var(--up); } .tag.s { background:var(--dn); } .tag.m { background:var(--ink); color:var(--card); }
+  .btn { text-align:center; font-weight:700; color:#fff; border-radius:9px; padding:7px; font-size:14px; background:var(--ok); }
   b.k { background:var(--hi); padding:0 5px; border-radius:4px; }
-  .s { color:var(--sub); font-size:15px; margin:0; }
   table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); font-size:15px; }
   th, td { padding:9px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
   th { font-size:13px; color:var(--sub); font-weight:400; }
   td:first-child { white-space:nowrap; font-weight:700; }
-  tr.v5 td { background:var(--acc-soft); }
-  details { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-top:8px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; font:14px/1.6 "Malgun Gothic","Apple SD Gothic Neo",sans-serif; white-space:pre-wrap; margin:0; }
+  pre b { color:var(--acc); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px 15px; display:grid; gap:6px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
   summary { cursor:pointer; font-weight:700; }
-  details p { margin:6px 0 0; color:var(--sub); font-size:15px; }
-  .foot { margin-top:36px; font-size:13px; color:var(--sub); }
+  details p, details ul { margin:6px 0 0; color:var(--sub); font-size:15px; }
+  details ul { padding-left:18px; }
+  .money { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; text-align:center; }
+  .money div { background:var(--bg); border-radius:10px; padding:8px 4px; display:grid; } .money b { font-size:17px; } .money span { font-size:12px; color:var(--sub); }
+  .money .on { background:var(--acc-soft); color:var(--acc); }
+  .foot { margin-top:24px; font-size:13px; color:var(--sub); }
 </style>
 </head>
 <body>
 <main>
   <h1>SOXL 도구 사용방법</h1>
+  <a class="app" href="https://kimduckhoon.github.io/soxl-pages/app.html">SOXL v5 앱 열기<span>모든 도구가 아래 버튼으로 이어져요. 휴대폰 홈 화면에 추가해 두세요.</span></a>
 
-  <div class="go">
-    <a class="main" href="https://kimduckhoon.github.io/soxl-pages/app.html">SOXL v5 앱 (한 번에 모두)<span>아래 버튼으로 연습·계산기·모의투자·과거·규칙서·사용법 이동. 홈 화면에 추가해 쓰세요</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/calc.html">포트 계산기<span>산 포트만 적으면 파는 가격·손절일·다음 매수 수량이 자동으로</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/practice.html">v5 실전 연습<span>실제 종가로 하루씩 넘기며 알림 → 주문 → 결과 연습</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/v5.html">v5 매매 규칙서<span>주 공식 v5를 한 장으로</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/paper.html">모의투자<span>연습 계좌를 공식들과 비교</span></a>
-    <a href="https://kimduckhoon.github.io/soxl-pages/simulator.html">과거 시뮬레이터<span>1994년부터, 공식별로 그때 시작했다면</span></a>
+  <h2>매일 아침, 두 단계면 끝</h2>
+  <p class="s">미국장이 열린 다음 날 아침(한국 7:30 이후)에 합니다. 실전 연습·모의투자·포트 계산기 모두 같은 순서예요.</p>
+
+  <div class="step one">
+    <span class="no">① 어젯밤 결과 반영</span>
+    <h3>체크된 것 확인 → 반영하기</h3>
+    <div class="mock">
+      <b>어젯밤(11/23) 결과 반영</b>
+      <div class="row"><span class="box"></span><span class="tag s">매도</span>P1 목표가 매도 40주 × $43.21</div>
+      <div class="row"><span class="box"></span><span class="tag s">매도</span>P2 손절 25주 × $43.21</div>
+      <div class="row"><span class="tag m" style="opacity:.5">매수</span><span class="xs">매수 안 됨: 종가가 매수가보다 높았어요</span></div>
+      <div class="btn">반영하기</div>
+    </div>
+    <p class="s">어젯밤 종가로 체결됐을 거래를 도구가 미리 골라 둡니다. 증권사 앱 체결 내역과 다른 것만 체크를 빼고 누르세요. 포트·현금·매도 기록이 자동으로 바뀌어요.</p>
   </div>
 
-  <h2>매일 할 일 (v5 기준)</h2>
-  <ol>
-    <li><div>아침 8:50 카톡의 맨 위 <b>v5</b> 줄을 봅니다</div></li>
-    <li><div>나온 가격·수량 그대로 증권사 앱에 주문 (매수·매도 <b>LOC</b>, 손절 <b>MOC</b>)</div></li>
-    <li><div>다음 날 아침 <b>포트 계산기</b>에서 <b class="k">어젯밤 결과 반영</b> 한 번 누르기</div></li>
-  </ol>
-  <p class="s" style="margin-top:8px">수량 계산은 카톡과 계산기가 다 해 줍니다. 직접 나누거나 곱할 필요 없어요.</p>
-  <div class="box" style="margin-top:10px">
-    <p style="margin:0"><b>실전에서는 "내 계좌" 숫자로 주문하세요.</b> 카톡의 v5 줄은 v5 가상 계좌(7만 달러) 기준이라 내 계좌와 수량이 다를 수 있어요.</p>
-    <p class="s">· <b>포트 계산기</b>에 내 현금·산 포트를 적고 <b>v5 칸</b>을 보거나<br>· <b>실전 매매일지</b>에 체결을 적고 설정을 손절 10, 매도 목표율 0.1로 두면 카톡 맨 위 <b>"내 계좌"</b> 줄로 와요.</p>
-    <p class="s">LOC·MOC 주문은 그날만 유효해서 <b>미국장이 열리는 날마다</b> 다시 넣어요. 아침에 어젯밤 체결부터 확인해 기록하고, 그다음 오늘 주문을 넣으세요.</p>
+  <div class="step two">
+    <span class="no">② 오늘 밤 넣을 주문</span>
+    <h3>나온 그대로 증권사 앱에 주문</h3>
+    <div class="mock">
+      <div class="row"><span class="tag b">매수</span><b>SOXL 매수 LOC $43.20 × 7주</b></div>
+      <div class="row"><span class="tag s">매도</span><b>SOXL 매도 LOC $47.52 × 57주</b></div>
+      <div class="row"><span class="tag m">손절</span><b>SOXL 손절 MOC × 66주</b></div>
+    </div>
+    <p class="s">매수·매도는 <b>LOC</b>, 손절은 <b>MOC</b>. 주문은 그날만 유효해서 장이 열리는 날마다 다시 넣어요. ①을 하기 전에는 잠겨 있어요(옛 숫자로 주문하지 않게).</p>
   </div>
 
-  <h2>카톡 읽는 법</h2>
+  <h2>어디서 하나요</h2>
+  <table>
+    <tr><th>지금</th><th>앱의 이 탭에서</th></tr>
+    <tr><td>연습</td><td><b>실전 연습</b>: 실제 지난 종가로 하루씩 넘기며 ①② 를 해 봐요.</td></tr>
+    <tr><td>모의 운영</td><td><b>모의투자</b>: 가상 계좌로 매일 ①② 를 하고, 공식 계좌들과 비교해요.</td></tr>
+    <tr><td>실전</td><td><b>계산기</b>: 내 진짜 계좌로 ①② 를 해요. 실전은 이것만 쓰면 돼요.</td></tr>
+  </table>
+
+  <h2>처음 한 번만</h2>
+  <div class="card">
+    <p><b>계산기</b>: 증권사 앱의 <b>달러 예수금</b>을 적고 <b class="k">시작</b>. 이미 산 SOXL 이 있으면 '포트 직접 고치기'에 매수일·가격·수량을 적어요.</p>
+    <p><b>모의투자</b>: 맨 아래 '계좌 설정'에서 시작일·금액(예: 7만 달러)을 저장해요.</p>
+    <p class="xs">기록은 그 휴대폰 브라우저에 저장돼요. 늘 같은 브라우저로 열고, 가끔 '기록 백업'을 눌러 카톡 나에게 보내기에 붙여 두세요.</p>
+  </div>
+
+  <h2>아침 카톡은</h2>
   <pre>[SOXL] 11/24(화) <b>v5: 매수 43.20×57</b>
 <b>v5 의견: 매수 (금액 1/4)</b>
 매수 43.20 이하 마감 시 57주
 v5 계좌 $70,000 (+0.0%) · 0/7포트
-AI: 일반 매수
-다른 공식 매수: 기존 100주 · v4 231주 · v6 14주 · v7 5주</pre>
-  <ol style="margin-top:8px">
-    <li><div><b>매수 43.20 이하 마감 시 57주</b> = 앱에서 LOC 매수 43.20달러 57주. 종가가 43.20 이하면 사지고 아니면 안 사져요</div></li>
-    <li><div><b>매도 47.52 이상</b>이 나오면 = 그 포트를 LOC 매도 47.52달러에. 종가가 그 이상이면 팔려요</div></li>
-    <li><div><b>손절 MOC</b>가 나오면 = 그 포트를 종가에 무조건 팔기</div></li>
-    <li><div><b>금액 1/4</b> = 반도체지수가 약해서 평소의 1/4만 사는 날. 수량에 이미 반영돼 있어요</div></li>
-  </ol>
-  <p class="s" style="margin-top:8px">근거와 AI 의견 자세히는 카톡의 <b class="k">리포트 보기</b>. 아래 줄의 다른 공식은 참고용이에요.</p>
+AI: 일반 매수</pre>
+  <p class="s">오늘 v5 가 무엇을 하는지와 AI 의견을 알려 주는 <b>안내</b>예요. 숫자는 v5 가상 계좌(7만 달러) 기준이라, <b>실제 주문 수량은 계산기 ② 를 따르세요</b>. 자세한 근거는 카톡의 '리포트 보기'.</p>
 
-  <h2>v5 규칙 한 줄 요약</h2>
-  <div class="box">
-    <p style="margin:0">7포트로 나눠, 떨어지면 한 포트 사고, <b>+10%</b> 오르면 팔고, <b>10거래일</b> 지나면 손절. 반도체지수가 200일 평균 아래면 <b>1/4만</b> 산다.</p>
-    <p class="s">예: 7만 달러 → 한 포트 1만 달러 → 약세장에선 2,500달러어치만. 남은 돈은 현금으로 두고 다음에 다시 나눠 써요. 자세한 내용은 위의 <b>v5 매매 규칙서</b>에 있어요.</p>
+  <h2>v5 규칙 한 줄</h2>
+  <div class="card">
+    <p>7포트로 나눠, 떨어지면 한 포트 사고, <b>+10%</b> 오르면 팔고, <b>10거래일</b> 지나면 손절. 반도체지수가 200일 평균 아래면 <b>1/4만</b> 산다.</p>
+    <div class="money"><div><b>$70,000</b><span>시작 돈</span></div><div><b>$10,000</b><span>한 포트 (÷7)</span></div><div class="on"><b>$2,500</b><span>약세장 매수</span></div></div>
+    <p class="xs">단위는 달러. 남은 돈은 현금으로 두고 다음에 다시 나눠 써요. 계산은 도구가 다 해 줘요. 자세히는 앱의 <b>규칙서</b> 탭.</p>
   </div>
 
-  <h2>공식 다섯 개 (참고)</h2>
-  <table>
-    <tr><th>공식</th><th>특징</th><th>1994~2026<br>연복리 · 최대 낙폭</th></tr>
-    <tr class="v5"><td>v5</td><td>주 공식. 수익이 가장 큼</td><td>+18.8% · −80%</td></tr>
-    <tr><td>기존</td><td>평소 장에 강하지만 긴 폭락에 거의 다 잃음</td><td>+3.9% · −98%</td></tr>
-    <tr><td>v4</td><td>손절 5일. 폭락에 강함</td><td>+13.3% · −70%</td></tr>
-    <tr><td>v6</td><td>1/4씩만 사서 낙폭이 가장 작음</td><td>+7.5% · −24%</td></tr>
-    <tr><td>v7</td><td>낙폭 30% 안에서 수익 최고</td><td>+9.7% · −28%</td></tr>
-  </table>
-  <p class="s" style="margin-top:8px">수수료 0.2%, 1994년부터 이어서 계산(2010년 이전은 반도체지수로 만든 합성 가격). 최대 낙폭은 가장 높았을 때에서 가장 많이 떨어진 비율이에요.</p>
-
-  <h2>도구 쓰는 법</h2>
-  <details open><summary>포트 계산기 (실전은 이것만)</summary>
-    <p><b>처음 한 번</b>: 증권사 앱의 달러 예수금을 적고 <b class="k">시작</b>. 이미 산 게 있으면 '포트 직접 고치기'에 적기.<br>
-    <b>매일 아침</b>: 맨 위 <b>어젯밤 결과 반영</b>에서 체결된 것만 체크돼 있는지 보고 <b class="k">반영하기</b> → 아래 <b>오늘 밤 넣을 주문</b>을 증권사 앱에 그대로 넣기. 끝.<br>
-    증권사 앱과 현금·수량이 다르면 '포트 직접 고치기'에서 맞추세요. 가끔 <b>기록 백업(복사)</b>을 눌러 카톡 나에게 보내기에 붙여 두면 안전해요.</p></details>
-  <details><summary>모의투자</summary>
-    <p>계좌 설정에서 시작일·금액을 저장하면 시작. <b>매일 아침</b>: 맨 위 <b>어젯밤 결과 반영</b>을 보고 <b class="k">체크한 대로 기록하기</b> → 아래 <b>오늘 밤 넣을 주문 (내 계좌 · v5)</b> 확인. 포트 계산기와 같은 흐름이라 연습한 그대로 실전에서 하면 돼요. 아래쪽에서 내 연습 계좌를 다섯 공식 계좌와 비교할 수 있어요.</p></details>
-  <details><summary>과거 시뮬레이터</summary>
-    <p>시작일·투자금을 넣으면 공식마다 얼마가 됐을지 보여 줘요. 1994년부터 고를 수 있어요 (2010년 3월 이전은 반도체지수로 만든 합성 가격).</p></details>
-  <details><summary>실전 매매일지 (구글시트, 선택)</summary>
-    <p>체결될 때마다 매매일지 탭에 한 줄 적으면 다음 날 카톡에 <b>내 계좌 포트별 주문</b>도 같이 와요. v5로 맞추려면 설정 탭에서 손절 10, 매도 목표율 0.1.</p></details>
-
-  <h2>용어</h2>
-  <table>
-    <tr><td>포트</td><td>돈을 7칸으로 나눈 한 칸. 한 번 산 묶음.</td></tr>
-    <tr><td>LOC</td><td>종가가 정한 가격 이하(매수)·이상(매도)이면 종가에 체결되는 주문.</td></tr>
-    <tr><td>MOC</td><td>가격 상관없이 종가에 무조건 체결되는 주문. 손절에 써요.</td></tr>
-    <tr><td>200일선</td><td>최근 200거래일 평균 가격. 지수가 이보다 낮으면 약세로 봐요.</td></tr>
-    <tr><td>최대 낙폭</td><td>계좌가 가장 높았을 때에서 가장 많이 떨어진 비율 (MDD).</td></tr>
-  </table>
-
-  <h2>안 될 때</h2>
+  <h2>자주 묻는 것</h2>
+  <details><summary>하루에 매수와 손절이 같이 나와요</summary><p>정상이에요(거래일의 약 9%). 두 주문을 각각 넣으면 돼요. 손절은 무조건 체결되고, 매수는 종가가 매수가 이하일 때만 체결돼요. 실전 연습의 '같은 날 매수 + 손절 예시로 이동'으로 확인해 보세요.</p></details>
+  <details><summary>며칠 동안 반영을 못 했어요</summary><p>도구가 "며칠 동안 반영이 안 됐어요"라고 알려 줘요. 증권사 앱을 보고 '포트 직접 고치기'(모의투자는 직접 기록)로 맞춘 뒤 '건너뛰기'를 누르면 다시 매일 ①② 로 돌아와요.</p></details>
+  <details><summary>도구의 현금이 증권사 앱 예수금과 달라요</summary><p>수수료를 0.2%로 어림해서 조금 다를 수 있어요. 가끔 '포트 직접 고치기'에서 현금을 앱 숫자로 맞춰 주세요.</p></details>
+  <details><summary>기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 늘 같은 브라우저(크롬)로 여세요. 백업해 둔 글이 있으면 '백업 붙여넣기'로 되살릴 수 있어요.</p></details>
   <details><summary>리포트가 404로 떠요</summary><p>sign in을 눌러 GitHub에 로그인하세요. 한 번 하면 다음부터 바로 열려요.</p></details>
-  <details><summary>계산기·모의투자 기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 늘 같은 브라우저(크롬)로 여세요. 백업해 둔 글이 있으면 <b>백업 붙여넣기</b>로 되살릴 수 있어요.</p></details>
-  <details><summary>오늘 종가가 안 보여요</summary><p>아침 7:30 이후에 새로고침하세요. 주말·미국 휴장일 다음 날은 바뀌지 않아요.</p></details>
+  <details><summary>오늘 종가가 안 바뀌어요</summary><p>아침 7:30 이후에 새로고침하세요. 주말·미국 휴장일 다음 날은 바뀌지 않아요.</p></details>
+
+  <h2>참고</h2>
+  <details><summary>공식 다섯 개 비교</summary>
+    <table style="margin-top:8px">
+      <tr><th>공식</th><th>특징</th><th>1994~2026<br>연복리 · 최대 낙폭</th></tr>
+      <tr><td style="color:var(--acc)">v5</td><td>주 공식. 수익이 가장 큼</td><td>+18.8% · −80%</td></tr>
+      <tr><td>기존</td><td>평소 장에 강하지만 긴 폭락에 거의 다 잃음</td><td>+3.9% · −98%</td></tr>
+      <tr><td>v4</td><td>손절 5일. 폭락에 강함</td><td>+13.3% · −70%</td></tr>
+      <tr><td>v6</td><td>1/4씩만 사서 낙폭이 가장 작음</td><td>+7.5% · −24%</td></tr>
+      <tr><td>v7</td><td>낙폭 30% 안에서 수익 최고</td><td>+9.7% · −28%</td></tr>
+    </table>
+    <p>수수료 0.2%, 1994년부터 이어서 계산(2010년 이전은 반도체지수로 만든 합성 가격). 2011년부터 v5 는 연복리 23.3%, 월복리 1.76% 였어요.</p></details>
+  <details><summary>용어</summary><ul>
+    <li><b>포트</b>: 돈을 7칸으로 나눈 한 칸. 한 번 산 묶음.</li>
+    <li><b>LOC</b>: 종가가 정한 가격 이하(매수)·이상(매도)이면 종가에 체결되는 주문.</li>
+    <li><b>MOC</b>: 가격 상관없이 종가에 무조건 체결. 손절에 써요.</li>
+    <li><b>200일선</b>: 최근 200거래일 평균. 지수가 이보다 낮으면 약세.</li>
+    <li><b>최대 낙폭(MDD)</b>: 계좌가 가장 높았을 때에서 가장 많이 떨어진 비율.</li></ul></details>
+  <details><summary>다른 도구</summary><ul>
+    <li><b>과거 시뮬레이터</b>(앱의 '과거' 탭): 1994년부터 언제 시작했다면 공식마다 얼마였을지.</li>
+    <li><b>실전 매매일지</b>(구글시트, 선택): 체결을 적으면 카톡 맨 위에 '내 계좌' 줄이 와요. 설정 탭을 손절 10, 매도 목표율 0.1 로 두면 v5 로 계산돼요.</li></ul></details>
 
   <p class="foot">모의 운영용 도구입니다. 투자 권유가 아니며, 과거 결과가 미래 수익을 보장하지 않습니다.</p>
 </main>
