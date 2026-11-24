@@ -55,8 +55,8 @@
   </div>
 
   <h2>공식별 매도 시점</h2>
-  <div class="card"><table id="sell"></table>
-    <p class="tip"><b>목표가</b> 이상으로 마감하면 그 포트 매도(LOC). <span class="hit">도달</span> = 어제 종가가 이미 목표가 위 (팔렸는지 확인). <b class="moc">손절일</b>에는 종가에 무조건 매도(MOC).</p></div>
+  <div class="card"><div style="overflow-x:auto"><table id="sell" style="min-width:470px"></table></div>
+    <p class="tip">표가 넓으면 옆으로 밀어 보세요. <b>목표가</b> 이상으로 마감하면 그 포트 매도(LOC). <span class="hit">도달</span> = 어제 종가가 이미 목표가 위 (팔렸는지 확인). <b class="moc">손절일</b>에는 종가에 무조건 매도(MOC).</p></div>
 
   <h2 id="buyh">다음 매수</h2>
   <div class="card"><table id="buy"></table>
@@ -84,6 +84,7 @@ const F = [
   {k:"v4",   stop:5,  sell:0.10, scale:()=>1},
   {k:"v5",   stop:10, sell:0.10, scale:()=>D.sox_above ? 1 : 0.25},
   {k:"v6",   stop:10, sell:0.05, scale:()=>0.25 * (D.sox_above ? 1 : 0.25)},
+  {k:"v7",   stop:10, sell:0.10, scale:()=>0.25 * (D.sox_above ? 1 : 0.10)},
 ];
 const HOL = new Set(D.holidays);
 const $ = id => document.getElementById(id);
@@ -118,7 +119,7 @@ function render(){
   const held = ports.map((p,i)=>({...p, i, price:parseFloat(p.p), qty:parseInt(p.q)||0})).filter(p=>p.d && p.price>0);
   // 매도 시점: 포트 x 공식
   let h = `<tr><th>포트</th>${F.map(f=>`<th>${f.k}<span class="sub">손절 ${f.stop}일 · 목표 +${f.sell*100}%</span></th>`).join("")}</tr>`;
-  if(!held.length) h += `<tr><td colspan="5" class="sub">아직 산 포트가 없습니다.</td></tr>`;
+  if(!held.length) h += `<tr><td colspan="6" class="sub">아직 산 포트가 없습니다.</td></tr>`;
   for(const p of held){
     const pnl = (D.close/p.price-1)*100;
     h += `<tr><td><b>P${p.i+1}</b><span class="sub">${p.price.toFixed(2)}${p.qty?` ×${p.qty}`:""}<br>${pnl>=0?"+":""}${pnl.toFixed(1)}%</span><button class="sold" type="button" data-sell="${p.i}">팔았음</button></td>`;
@@ -137,8 +138,8 @@ function render(){
   let b = `<tr><th>공식</th><th>매수가 (이하 마감 시)</th><th>수량</th></tr>`;
   for(const f of F){
     const budget = free ? cash/free*f.scale() : 0, q = free ? Math.floor(budget/price) : 0;
-    b += `<tr class="${(f.k==="v5"&&!D.sox_above)||f.k==="v6"?"buy":""}"><td><b>${f.k}</b></td><td><b>${free?price.toFixed(2):"-"}</b></td>
-      <td><b>${cash?q:"-"}</b><span class="sub">${cash&&free?`1회 매수금 $${money(budget)}${f.k==="v6"?" (기본 1/4"+(D.sox_above?"":" · 지수 약세 1/4")+")":f.scale()<1?" (지수 약세 1/4)":""}`:"현금을 적으면 수량이 나와요"}</span></td></tr>`;
+    b += `<tr class="${(f.k==="v5"&&!D.sox_above)||f.k==="v6"||f.k==="v7"?"buy":""}"><td><b>${f.k}</b></td><td><b>${free?price.toFixed(2):"-"}</b></td>
+      <td><b>${cash?q:"-"}</b><span class="sub">${cash&&free?`1회 매수금 $${money(budget)}${f.k==="v7"?" (기본 1/4"+(D.sox_above?"":" · 지수 약세 1/10")+")":f.k==="v6"?" (기본 1/4"+(D.sox_above?"":" · 지수 약세 1/4")+")":f.scale()<1?" (지수 약세 1/4)":""}`:"현금을 적으면 수량이 나와요"}</span></td></tr>`;
   }
   $("buy").innerHTML = b;
   // 매도 기록
