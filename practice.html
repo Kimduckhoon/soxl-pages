@@ -103,12 +103,14 @@ button:focus-visible, select:focus-visible { outline:2px solid var(--accent); ou
 
   <section class="screen" id="s-today" aria-label="오늘">
     <div class="card" id="resultCard" hidden></div>
+    <button class="ghost" id="jumpBoth" type="button">같은 날 매수 + 손절 예시로 이동</button>
     <div class="chat">
       <div class="who"><i></i>SOXL 알림 · 오전 8:50</div>
       <div class="bubble" id="bubble"></div>
     </div>
     <div class="card">
       <div class="label">증권사 앱에 넣을 주문 · <span id="ordDate"></span></div>
+      <p id="bothNote" class="sub" style="background:var(--accent-soft);border-radius:10px;padding:8px 10px" hidden></p>
       <div id="tickets" style="display:grid;gap:8px"></div>
       <p class="small">LOC: 종가가 정한 가격 이하(매수)·이상(매도)이면 종가에 체결. MOC: 종가에 무조건 체결. "주문했어요"는 연습용 체크입니다.</p>
     </div>
@@ -174,6 +176,7 @@ button:focus-visible, select:focus-visible { outline:2px solid var(--accent); ou
       <li><b>매도 47.52 이상 57주</b> → 그 포트를 LOC 매도 47.52달러에.</li>
       <li><b>손절 MOC 66주</b> → 그 포트를 종가에 무조건 매도.</li>
       <li><b>금액 1/4</b> → 반도체지수가 약한 날. 수량에 이미 반영돼 있습니다.</li>
+      <li><b>매수와 손절이 같이</b> 오는 날도 있습니다(2010년 이후 거래일의 약 9%). 두 주문을 각각 넣으면 됩니다. "오늘" 탭의 <b>같은 날 매수 + 손절 예시로 이동</b>으로 확인해 보세요.</li>
       <li>아래 "다른 공식 매수" 줄은 참고용입니다.</li></ul></div>
     <div class="card"><h3>도구</h3><ul class="plain">
       <li><a href="https://kimduckhoon.github.io/soxl-pages/calc.html">포트 계산기</a>: 산 포트만 적으면 파는 가격·손절일·다음 매수 수량.</li>
@@ -309,6 +312,8 @@ const DATA = {"dates":["2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025
                                     : `<li>매수 미체결: 종가 $${last.close.toFixed(2)} 가 매수가 $${po.buy.price.toFixed(2)} 보다 높았어요</li>`);
       r.lots.filter(l => l.sellIdx === cur - s0).forEach(l => items.push(`<li class="${l.realized >= 0 ? "up" : "down"}">${l.result === "익절" ? "목표가 매도" : "손절 매도"}: ${l.qty}주 × $${l.sellPrice.toFixed(2)} → ${l.realized >= 0 ? "+" : "−"}${usd(Math.abs(l.realized))}</li>`));
       if (!items.length) items.push("<li>체결된 주문이 없어요</li>");
+      const stopped = r.lots.some(l => l.sellIdx === cur - s0 && l.result !== "익절");
+      if (bought && stopped) items.unshift('<li><span class="hl">같은 날 매수 + 손절</span> 열흘 전 산 포트는 손절로 팔리고, 새 포트는 오늘 종가에 샀어요. 두 주문이 따로 체결된 거예요.</li>');
       const ch = last.close / C[cur - 1] - 1;
       rc.hidden = false;
       rc.innerHTML = `<div class="label">${md(today)} 장 결과</div><p>SOXL 종가 <b class="num">$${last.close.toFixed(2)}</b> <span class="${ch >= 0 ? "up" : "down"} num">${pct(ch)}</span></p><div class="result"><ul>${items.join("")}</ul></div><p class="small">계좌 ${usd(last.total)} (${pct(last.total / P.capital - 1)}) · 보유 ${last.held}/7포트</p>`;
@@ -319,6 +324,10 @@ const DATA = {"dates":["2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025
     const parts = [b ? `매수 ${b.price.toFixed(2)} 이하 마감 시 ${b.qty}주` : "", moc.length ? `손절 MOC ${moc.reduce((a, x) => a + x.qty, 0)}주` : "", loc.length ? "매도 " + loc.slice(0, 3).map(x => x.price.toFixed(2) + " 이상 " + x.qty + "주").join(", ") + (loc.length > 3 ? " 외" : "") : ""].filter(Boolean);
     const shortT = (b ? `매수 ${b.price.toFixed(2)}×${b.qty}` : "매수 없음") + (moc.length ? ` · 손절 ${moc.reduce((a, x) => a + x.qty, 0)}주` : "") + (loc.length ? ` · 매도대기 ${loc.length}` : "");
     $("bubble").innerHTML = `<span class="t">[SOXL] ${md(o.nd)} <span class="v5">v5: ${shortT}</span></span>\n<span class="v5">v5 의견: ${label}</span>\n${parts.join("\n") || "주문 없음"}\nv5 계좌 ${usd(last.total)} (${pct(last.total / P.capital - 1)}) · ${last.held}/7포트\n<span class="small">반도체지수 200일선 ${UP[cur] ? "위 → 한 포트 다 사기" : "아래 → 1/4만 사기"}</span><span class="link">리포트 보기</span>`;
+    // 같은 날 매수 + 손절 안내
+    const hasMoc = o.out.some(x => x.kind === "MOC");
+    $("bothNote").hidden = !(o.buy && hasMoc);
+    if (o.buy && hasMoc) $("bothNote").innerHTML = `<b>오늘은 매수와 손절이 같이 있어요.</b> 둘 다 넣으세요. 손절은 MOC(종가에 무조건 매도), 매수는 LOC(종가가 ${o.buy.price.toFixed(2)} 이하일 때만 체결). 매수가 안 되더라도 손절은 그대로 체결돼요.`;
     // 주문표
     $("ordDate").textContent = md(o.nd) + " 종가 주문";
     $("tickets").innerHTML = o.out.length ? o.out.map((x, k) => {
@@ -363,6 +372,15 @@ const DATA = {"dates":["2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025
   $("prev").onclick = () => { if (cur > s0 + 1) { cur--; render(); } };
   $("next").onclick = $("advance").onclick = () => { if (cur < D.length - 1) { cur++; render(); $("s-today").scrollTop = 0; } };
   $("toEnd").onclick = () => { cur = D.length - 1; render(); };
+  // i 다음 날(i+1) 매수와 손절이 둘 다 체결되는지
+  function bothNext(i) { if (i + 1 >= D.length) return false; const r = sim(i + 1), k = i + 1 - s0;
+    return r.lots.some(l => l.buyIdx === k) && r.lots.some(l => l.sellIdx === k && l.result !== "익절"); }
+  $("jumpBoth").onclick = () => {
+    const go = i => { cur = i; render(); $("s-today").scrollTop = 0; $("jumpBoth").textContent = "▶ 를 누르면 다음 날 둘 다 체결되는 걸 볼 수 있어요 (다른 예시: 다시 누르기)"; };
+    for (let i = cur + 1; i < D.length - 1; i++) if (bothNext(i)) return go(i);
+    for (let i = s0 + 1; i < cur; i++) if (bothNext(i)) return go(i);
+    $("jumpBoth").textContent = "이 기간에는 같은 날 매수 + 손절이 없어요. 시작 시점을 바꿔 보세요";
+  };
   $("tickets").addEventListener("click", e => { const k = e.target.dataset && e.target.dataset.k; if (k) { done[k] = !done[k]; render(); } });
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
     document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
