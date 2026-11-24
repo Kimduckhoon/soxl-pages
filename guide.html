@@ -28,6 +28,10 @@
   details { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-top:8px; }
   summary { cursor:pointer; font-weight:700; }
   details p { margin:6px 0 0; color:var(--sub); font-size:15px; }
+  td .s { font-size:12px; }
+  th:first-child, td:first-child { white-space:nowrap; }
+  td:last-child, th:last-child { white-space:nowrap; }
+  table td:nth-child(2) { white-space:normal; }
   .foot { margin-top:36px; font-size:13px; color:var(--sub); }
 </style>
 </head>
@@ -42,41 +46,58 @@
     <a class="plain" href="https://drive.google.com/">실전 매매일지 (구글 드라이브)<span>"SOXL 떨사오팔 실전 매매일지" 열기</span></a>
   </div>
 
+  <h2>하루 흐름</h2>
+  <ol>
+    <li><div>아침 8:50 카톡에 <b>세 공식의 내일 주문</b>이 와요</div></li>
+    <li><div>따를 공식을 골라 증권사 앱에 주문 (매수·매도는 <b>LOC</b>, 손절은 <b>MOC</b>)</div></li>
+    <li><div>체결되면 <b>포트 계산기</b>(또는 매매일지)에 적기</div></li>
+  </ol>
+
   <h2>세 공식</h2>
   <table>
-    <tr><th>공식</th><th>규칙</th><th>잘 맞는 때</th></tr>
-    <tr><td><b>기존</b></td><td>손절 30일 · 산 값에 팔기</td><td>평소 장. 수익이 가장 큼</td></tr>
-    <tr><td><b>v4</b></td><td>손절 5일 · +10%에 팔기</td><td>폭락장. 손실을 빨리 끊음</td></tr>
-    <tr><td><b>v5</b></td><td>손절 10일 · +10%에 팔기 · 반도체지수가 200일선 아래면 1/4만 사기</td><td>그 중간</td></tr>
+    <tr><th>공식</th><th>규칙</th><th>2020~<br>수익 · MDD</th></tr>
+    <tr><td><b>기존</b></td><td>손절 30일 · 산 값에 팔기</td><td>+483%<br>−75%</td></tr>
+    <tr><td><b>v4</b></td><td>손절 5일 · +10%에 팔기</td><td>+482%<br>−46%</td></tr>
+    <tr><td><b>v5</b></td><td>손절 10일 · +10%에 팔기 · 반도체지수가 200일선 아래면 1/4만 사기</td><td>+709%<br>−45%</td></tr>
   </table>
-  <p class="tip">셋 다 7포트, 하루에 한 포트씩 삽니다. 어느 공식을 따를지는 직접 정하세요.</p>
+  <p class="tip">셋 다 7포트, 하루에 한 포트씩 삽니다. 기존은 평소 장에 강하고 긴 폭락에 약해요. v4는 폭락에 강하고, v5는 그 중간이에요. 어느 공식을 따를지는 직접 정하세요.</p>
 
-  <h2>아침 8:50 카톡 읽는 법</h2>
+  <h2>카톡 읽는 법</h2>
   <pre>기존: 매수 43.20×100 · 매도대기 2 · 손절 110주
 v4: 매수 43.20×231
 v5: 매수 43.20×57 (SOX 200일선 아래 → 매수금 25%)</pre>
   <ol style="margin-top:8px">
-    <li><div><b>매수 43.20×100</b> = 오늘 밤 종가가 43.20 이하로 마감하면 100주 사기 (LOC)</div></li>
-    <li><div><b>매도대기</b> = 목표가 이상으로 마감하면 팔릴 포트 수 (LOC)</div></li>
-    <li><div><b>손절</b> = 손절일이 된 포트, 종가에 무조건 팔기 (MOC)</div></li>
+    <li><div><b>매수 43.20×100</b> = 오늘 밤 종가가 43.20 이하로 마감하면 100주 사기</div></li>
+    <li><div><b>매도대기 2</b> = 목표가 이상으로 마감하면 팔릴 포트가 2개</div></li>
+    <li><div><b>손절 110주</b> = 손절일이 된 포트, 종가에 무조건 팔기</div></li>
   </ol>
-  <p class="tip">자세한 근거는 카톡의 <b class="k">리포트 보기</b>.</p>
+  <p class="tip">근거와 AI 의견은 카톡의 <b class="k">리포트 보기</b>.</p>
 
-  <h2>포트 계산기</h2>
-  <ol>
-    <li><div>현금(달러)을 적고, <b>산 포트만</b> 매수일·매수가·수량을 적기</div></li>
-    <li><div>공식별로 <b>목표가</b>(이 값 이상 마감 시 매도)와 <b>손절일</b>이 바로 나옴</div></li>
-    <li><div>아래에 <b>다음 매수가·수량</b>이 공식별로 나옴</div></li>
-    <li><div>팔면 그 포트의 <b class="k">팔았음</b> → 매도가 확인 → 기록. 칸이 비워지고 <b>매도 기록</b>에 손익이 쌓여요</div></li>
-  </ol>
-  <p class="tip">종가는 매일 아침 7:30쯤 자동 갱신. 적은 내용은 휴대폰에만 저장돼요. 가끔 <b>기록 백업(복사)</b>을 눌러 카톡 나에게 보내기에 붙여 두면 안전해요.</p>
+  <h2>도구</h2>
+  <details open><summary>포트 계산기</summary>
+    <p>현금과 <b>산 포트만</b>(매수일·매수가·수량) 적으면, 공식별 <b>목표가·손절일</b>과 <b>다음 매수가·수량</b>이 나와요. 팔면 그 포트의 <b class="k">팔았음</b>을 누르면 칸이 비워지고 매도 기록에 손익이 쌓여요. 가끔 <b>기록 백업(복사)</b>을 눌러 카톡 나에게 보내기에 붙여 두세요.</p></details>
+  <details><summary>모의투자</summary>
+    <p>연습으로 사고판 기록을 적으면, 같은 날 같은 돈으로 시작한 세 공식 계좌와 비교해 줘요. 공식 주문의 <b class="k">폼에 채우기</b> → 체결가를 실제 종가로 고치기 → 기록하기.</p></details>
+  <details><summary>과거 시뮬레이터</summary>
+    <p>시작일·투자금을 넣으면(또는 <b class="k">최근 1년</b> 같은 버튼) 세 공식이 각각 얼마가 됐을지 카드와 그래프로 보여 줘요. 돈이 가장 많이 남은 공식에 초록 테두리가 생겨요.</p></details>
+  <details><summary>실전 매매일지 (구글시트, 선택)</summary>
+    <p>체결될 때마다 매매일지 탭에 한 줄(날짜, 포트 1~7, 매수/매도, 체결가, 수량, 수수료). 다음 날 카톡 맨 위에 <b>내 계좌 포트별 주문</b>이 같이 와요. 계산 규칙은 설정 탭을 따라요(v4로 하려면 손절 5, 매도 목표율 0.1).</p></details>
 
-  <h2>실전 매매일지 (선택)</h2>
-  <p class="s" style="margin:0">체결될 때마다 <b>매매일지</b> 탭에 한 줄(날짜, 포트 1~7, 매수/매도, 체결가, 수량, 수수료). 그러면 다음 날 카톡 맨 위에 <b>내 계좌 포트별 주문</b>이 같이 옵니다. 계산 규칙은 <b>설정</b> 탭을 따릅니다(v4로 하려면 손절 5, 매도 목표율 0.1).</p>
+  <h2>용어</h2>
+  <table>
+    <tr><td><b>MDD</b><br><span class="s">최대 낙폭</span></td><td>가장 높았던 때에서 가장 많이 떨어진 비율. 예: 10만 달러까지 올랐다가 6만 달러까지 내려갔으면 MDD −40%. 작을수록 덜 무서운 공식이에요.</td></tr>
+    <tr><td><b>포트</b></td><td>돈을 7칸으로 나눈 한 칸. 한 번 산 묶음 = 한 포트.</td></tr>
+    <tr><td><b>LOC</b></td><td>"종가가 이 가격 이하(매수)·이상(매도)이면 종가에 체결" 주문.</td></tr>
+    <tr><td><b>MOC</b></td><td>가격 상관없이 종가에 무조건 체결되는 주문. 손절일에 써요.</td></tr>
+    <tr><td><b>목표가</b></td><td>이 가격 이상으로 마감하면 그 포트를 파는 가격 (기존 = 산 값, v4·v5 = 산 값 +10%).</td></tr>
+    <tr><td><b>손절일</b></td><td>산 날부터 정해진 거래일(30·5·10일)이 지나면 손해여도 파는 날.</td></tr>
+    <tr><td><b>200일선</b></td><td>최근 200거래일 평균 가격. 지수가 이보다 아래면 약세로 봐요 (v5가 매수금을 1/4로 줄이는 기준).</td></tr>
+    <tr><td><b>평균 현금 비중</b></td><td>기간 동안 계좌에서 현금이 차지한 평균 비율. 높을수록 덜 투자된 상태.</td></tr>
+  </table>
 
   <h2>안 될 때</h2>
   <details><summary>리포트가 404로 떠요</summary><p>sign in을 눌러 GitHub에 로그인하세요. 한 번 하면 다음부터 바로 열려요.</p></details>
-  <details><summary>계산기·모의투자 기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 늘 같은 브라우저(크롬)로 여세요.</p></details>
+  <details><summary>계산기·모의투자 기록이 없어졌어요</summary><p>다른 브라우저로 열었을 수 있어요. 늘 같은 브라우저(크롬)로 여세요. 백업해 둔 글이 있으면 <b>백업 붙여넣기</b>로 되살릴 수 있어요.</p></details>
   <details><summary>오늘 종가가 안 보여요</summary><p>아침 7:30 이후에 새로고침하세요. 주말·미국 휴장일 다음 날은 바뀌지 않아요.</p></details>
 
   <p class="foot">모의 운영용 도구입니다. 투자 권유가 아니며, 과거 결과가 미래 수익을 보장하지 않습니다.</p>
