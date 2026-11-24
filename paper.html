@@ -120,8 +120,25 @@ details[open] summary { margin-bottom:12px }
     <div class="gap" id="gapLine">-</div>
   </section>
 
+  <section class="card" id="applyCard" hidden style="border:2px solid var(--accent)">
+    <div class="hint">아침 할 일 ①</div>
+    <h2 id="applyTitle" style="margin:0">어젯밤 결과 반영</h2>
+    <p class="hint" id="applyLead" style="margin:4px 0 8px"></p>
+    <div id="applyList" class="order"></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="primary" id="applyBtn" style="flex:1">체크한 대로 기록하기</button><button type="button" id="skipBtn">건너뛰기</button></div>
+    <p class="hint" style="margin:8px 0 0">내 연습 계좌가 어젯밤 v5 주문을 다 넣었다고 보고, 종가로 체결됐을 거래를 골라 놓았어요. 다른 건 체크를 빼고 기록하세요. 체결가는 그날 종가입니다.</p>
+    <div class="msg" id="applyMsg" role="status"></div>
+  </section>
+
+  <section class="card" style="border:2px solid var(--v5)">
+    <div class="hint" id="myOrdHint">아침 할 일 ②</div>
+    <h2 id="myOrdTitle" style="margin:0 0 10px">오늘 밤 넣을 주문 (내 계좌 · v5)</h2>
+    <div class="order" id="myOrders"></div>
+    <p class="hint" style="margin:10px 0 0">내 연습 계좌의 현금과 산 포트로 계산한 v5 주문입니다. 실전에서는 증권사 앱에 이대로 넣어요. 다음 날 아침 위 ① 에서 결과를 반영하면 됩니다.</p>
+  </section>
+
   <section class="card">
-    <h2 id="orderTitle">다음 거래일 공식 주문</h2>
+    <h2 id="orderTitle">다음 거래일 공식 주문 (참고)</h2>
     <div class="order" id="orderList"></div>
     <p class="hint" style="margin:10px 0 0">다섯 공식 계좌(같은 날 같은 돈으로 시작)가 다음 거래일 종가에 하게 될 주문입니다. 따를 공식의 "폼에 채우기"를 누르세요. 기존 = 손절 30일·산 값에 매도, v4 = 손절 5일·+10% 매도, v5 = 손절 10일·+10% 매도·반도체지수 200일선 아래면 1회 매수금 1/4, v6 = 손절 10일·+5% 매도·매수금 1/4(지수 약세면 1/16, 계좌가 고점보다 15% 넘게 빠지면 그 절반), v7 = 손절 10일·+10% 매도·매수금 1/4(지수 약세면 1/40).</p>
   </section>
@@ -289,6 +306,88 @@ details[open] summary { margin-bottom:12px }
   var pct = function (x) { return (x > 0 ? '+' : '') + (x * 100).toFixed(2) + '%'; };
   var cls = function (x) { return x > 0.00001 ? 'up' : (x < -0.00001 ? 'down' : ''); };
   var rd2 = function (x) { return Math.floor(x * 100 + 1e-9) / 100; };
+  var r2 = function (x) { return Math.floor(x * 100 + 0.5 + 1e-9) / 100; };
+  var md = function (s) { var d = new Date(s + 'T00:00:00Z'); return (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + '(' + '일월화수목금토'[d.getUTCDay()] + ')'; };
+  function upAt(d) { var i = D.dates.indexOf(d); if (i < 0) i = D.dates.length - 1; return D.sox_up ? D.sox_up[i] : true; }
+  // 내 기록에서 포트(산 묶음)를 다시 만든다: 매수 1건 = 1포트, 매도는 같은 수량 포트부터(없으면 먼저 산 것부터) 뺀다
+  function myLots(list, upto) {
+    var lots = [];
+    sortedTrades(list).forEach(function (t) {
+      if (upto && t.date > upto) return;
+      if (t.side === 'buy') { lots.push({ date: t.date, price: t.price, qty: t.qty }); return; }
+      var q = t.qty, k = -1;
+      for (var i = 0; i < lots.length; i++) if (lots[i].qty === q) { k = i; break; }
+      if (k >= 0) { lots.splice(k, 1); return; }
+      while (q > 0 && lots.length) { var u = Math.min(q, lots[0].qty); lots[0].qty -= u; q -= u; if (!lots[0].qty) lots.shift(); }
+    });
+    return lots;
+  }
+  function v5Orders(lots, cash, close, up, nd) {
+    var out = [];
+    lots.forEach(function (l, i) {
+      var stop = E.workday(l.date, 10, HOL), tgt = r2(l.price * 1.10);
+      if (stop <= nd) out.push({ side: 'sell', kind: 'MOC', qty: l.qty, html: '손절 <b class="num">MOC × ' + l.qty + '주</b> <span class="hint">(' + md(l.date) + ' $' + l.price.toFixed(2) + '에 산 포트 · 손절일)</span>', fill: { side: 'sell', date: nd, price: '', qty: l.qty, tag: 'v5' } });
+      else out.push({ side: 'sell', kind: 'LOC', qty: l.qty, price: tgt, html: '종가가 <b class="num">$' + tgt.toFixed(2) + '</b> 이상이면 ' + l.qty + '주 매도 <span class="hint">(' + md(l.date) + ' $' + l.price.toFixed(2) + '에 산 포트 · 손절일 ' + md(stop) + ')</span>', fill: { side: 'sell', date: nd, price: tgt, qty: l.qty, tag: 'v5' } });
+    });
+    var free = 7 - lots.length;
+    if (free > 0 && cash > 0) {
+      var sc = up ? 1 : 0.25, I = rd2(close - 1e-9), H = cash / free * sc, J = Math.floor(H / I);
+      if (J > 0) out.push({ side: 'buy', kind: 'LOC', qty: J, price: I, html: '종가가 <b class="num">$' + I.toFixed(2) + '</b> 이하이면 <b class="num">' + J + '주</b> 매수 <span class="hint">(1회 매수금 ' + usd(H, 0) + (sc < 1 ? ', 반도체지수 약세라 1/4' : '') + ' · 빈 포트 ' + free + '개)</span>', fill: { side: 'buy', date: nd, price: I, qty: J, tag: 'v5' } });
+    }
+    return out;
+  }
+  // 어젯밤(R.last) 결과: 그 전 거래일 종가로 낸 v5 주문이 어떻게 됐을지
+  var pending = [];
+  function applyNeeded(R) {
+    var c = R.c, L = R.last, all = Object.keys(R.m).sort(), i = all.indexOf(L);
+    if (!state.canWrite || i < 1) return null;
+    var prev = all[i - 1];
+    if (prev < c.start) return null;
+    if (!state.trades.length && !state.cfg) return null;            // 아직 시작 안 함
+    if ((state.cfg || {}).applied === L) return null;
+    if (state.trades.some(function (t) { return t.date === L; })) return null;   // 그날 이미 직접 기록함
+    return { L: L, prev: prev, prevClose: R.m[prev], close: R.L };
+  }
+  function lastNight(R, a) {
+    var c = R.c, lots = myLots(state.trades, a.prev), s = replay(state.trades, c, a.prev), items = [];
+    lots.forEach(function (l, k) {
+      var stop = E.workday(l.date, 10, HOL), tgt = r2(l.price * 1.10);
+      if (stop <= a.L) items.push({ side: 'sell', qty: l.qty, txt: '손절: ' + l.qty + '주 × $' + a.close.toFixed(2) + ' <span class="hint">(' + md(l.date) + ' $' + l.price.toFixed(2) + '에 산 포트)</span>' });
+      else if (a.close >= tgt) items.push({ side: 'sell', qty: l.qty, txt: '목표가 매도: ' + l.qty + '주 × $' + a.close.toFixed(2) + ' <span class="hint">(목표 $' + tgt.toFixed(2) + ')</span>' });
+    });
+    var free = 7 - lots.length;
+    if (free > 0 && s.cash > 0) {
+      var sc = upAt(a.prev) ? 1 : 0.25, I = rd2(a.prevClose - 1e-9), J = Math.floor(s.cash / free * sc / I);
+      if (J > 0) {
+        if (a.close <= I) items.push({ side: 'buy', qty: J, txt: '매수 체결: ' + J + '주 × $' + a.close.toFixed(2) + ' <span class="hint">(매수가 $' + I.toFixed(2) + ' 이하로 마감)</span>' });
+        else items.push({ info: true, txt: '매수 안 됨: 종가 $' + a.close.toFixed(2) + ' 가 매수가 $' + I.toFixed(2) + ' 보다 높았어요' });
+      }
+    }
+    return items;
+  }
+  function renderApply(R) {
+    var a = applyNeeded(R), card = $('applyCard');
+    card.hidden = !a; if (!a) return false;
+    pending = lastNight(R, a); pending.a = a;
+    var ch = a.close / a.prevClose - 1;
+    $('applyTitle').textContent = '어젯밤(' + md(a.L) + ') 결과 반영';
+    $('applyLead').innerHTML = 'SOXL 종가 <b class="num">$' + a.close.toFixed(2) + '</b> <span class="num ' + cls(ch) + '">' + pct(ch) + '</span>';
+    $('applyList').innerHTML = pending.length ? pending.map(function (x, k) {
+      return x.info ? '<div class="oline"><span class="tag n">매수</span><span class="what">' + x.txt + '</span></div>'
+        : '<label class="oline" style="cursor:pointer"><input type="checkbox" data-k="' + k + '" checked style="width:20px;height:20px"><span class="tag ' + (x.side === 'buy' ? 'b' : 's') + '">' + (x.side === 'buy' ? '매수' : '매도') + '</span><span class="what">' + x.txt + '</span></label>';
+    }).join('') : '<div class="empty">어젯밤 체결된 주문이 없어요.</div>';
+    return true;
+  }
+  function renderMyOrders(R, waiting) {
+    var box = $('myOrders'), nd = E.workday(R.last, 1, HOL);
+    $('myOrdTitle').textContent = md(nd) + ' 넣을 주문 (내 계좌 · v5)';
+    box.innerHTML = '';
+    if (!state.trades.length && !state.cfg) { box.innerHTML = '<div class="empty">아래 계좌 설정에서 시작 기준일·금액을 저장하면 주문이 나와요.</div>'; return; }
+    if (waiting) { box.innerHTML = '<div class="empty"><b>먼저 위에서 어젯밤 결과를 기록하거나 건너뛰기를 누르세요.</b><br>그다음 오늘 밤 주문이 나와요.</div>'; return; }
+    var out = v5Orders(myLots(state.trades), R.now.cash, R.L, upAt(R.last), nd);
+    if (!out.length) { box.innerHTML = '<div class="empty">오늘 밤은 넣을 주문이 없어요.</div>'; return; }
+    out.forEach(function (o) { box.appendChild(line(o.side === 'buy' ? 'b' : 's', o.side === 'buy' ? '매수' : (o.kind === 'MOC' ? '손절' : '매도'), o.html, o.fill)); });
+  }
 
   function cfg() {
     var c = state.cfg || {};
@@ -390,6 +489,7 @@ details[open] summary { margin-bottom:12px }
     $('gapLine').innerHTML = c.start + ' 종가 기준 ' + usd(c.capital, 0) + '로 시작 · 내 계좌 ' + gaps.join(' · ') +
       ' · 처음에 전부 샀다면 <span class="num ' + cls(hR) + '">' + pct(hR) + '</span>';
     renderOrder(R);
+    renderMyOrders(R, renderApply(R));
     renderHold(R);
     renderChart(R.eq);
     renderTrades();
@@ -400,7 +500,7 @@ details[open] summary { margin-bottom:12px }
 
   function renderOrder(R) {
     var next = E.workday(R.last, 1, HOL), box = $('orderList'); box.innerHTML = '';
-    $('orderTitle').textContent = next + ' (다음 거래일) 다섯 공식 주문';
+    $('orderTitle').textContent = next + ' 공식 계좌들의 주문 (참고)';
     R.FS.forEach(function (f) {
       var hd = document.createElement('div'); hd.className = 'ohead';
       hd.innerHTML = '<i style="background:' + f.col + '"></i>' + f.k + ' <span>' + f.note + '</span>';
@@ -561,6 +661,25 @@ details[open] summary { margin-bottom:12px }
       .then(function () { $('submitBtn').disabled = false; });
   });
 
+  function markApplied(L) { return state.db.doc('config/main').set(Object.assign({}, cfg(), { applied: L })); }
+  $('applyBtn').onclick = function () {
+    var a = pending.a, c = cfg(), msg = $('applyMsg'), now = Date.now(), add = [];
+    if (!a) return;
+    document.querySelectorAll('#applyList input[type=checkbox]').forEach(function (el) { pending[+el.dataset.k].on = el.checked; });
+    pending.filter(function (x) { return x.on && x.side === 'sell'; }).concat(pending.filter(function (x) { return x.on && x.side === 'buy'; }))
+      .forEach(function (x, k) { add.push({ side: x.side, date: a.L, price: Math.round(a.close * 100) / 100, qty: x.qty, tag: 'v5', memo: '어젯밤 결과 반영', createdAt: now + k }); });
+    var chk = replay(state.trades.concat(add), c);
+    msg.className = 'msg err';
+    if (chk.err) { msg.textContent = '기록할 수 없습니다: ' + chk.err; return; }
+    $('applyBtn').disabled = true;
+    var p = markApplied(a.L);
+    add.forEach(function (t) { p = p.then(function () { return state.db.collection('trades').add(t); }); });
+    p.then(function () { msg.className = 'msg ok'; msg.textContent = add.length ? add.length + '건을 기록했어요.' : '반영했어요.'; })
+     .catch(function (e) { msg.textContent = '저장하지 못했습니다 (' + (e && e.code) + ').'; })
+     .then(function () { $('applyBtn').disabled = false; });
+  };
+  $('skipBtn').onclick = function () { var a = pending.a; if (a) markApplied(a.L); };
+
   $('priceForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var d = $('pDate').value, v = Math.round(+$('pClose').value * 100) / 100, msg = $('pMsg');
@@ -576,7 +695,7 @@ details[open] summary { margin-bottom:12px }
 
   $('setForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
-    var msg = $('sMsg'), n = { start: $('sStart').value, capital: +$('sCap').value, fee: +$('sFee').value / 100 };
+    var msg = $('sMsg'), n = { start: $('sStart').value, capital: +$('sCap').value, fee: +$('sFee').value / 100, applied: (state.cfg || {}).applied || null };
     msg.className = 'msg err';
     if (!state.canWrite) { msg.textContent = '이 화면에서는 저장할 수 없습니다.'; return; }
     if (!n.start || !(n.capital >= 100) || !(n.fee >= 0)) { msg.textContent = '값을 모두 바르게 넣어 주세요.'; return; }
