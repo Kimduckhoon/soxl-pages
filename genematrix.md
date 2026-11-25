@@ -1,38 +1,41 @@
-# 진매트릭스 아침 소식 (2026-11-25 08:20)
+# 진매트릭스 아침 소식 (2026-11-26 08:20)
 
-**주가:** 11/25 종가 1,220원 0 (0.00%)  
+**주가:** 11/26 종가 1,221원 0 (0.00%)  
 [네이버 증권에서 보기](https://m.stock.naver.com/domestic/stock/109820/total)
 
-## 진매트릭스 소식 (1건)
+## 진매트릭스 소식 (5건)
+- [생물공학株 매수세 활짝…알테오젠 재평가속 코오롱티슈진·펩트론 폭풍질주](https://news.google.com/rss/articles/CBMid0FVX3lxTE9TSkZzN0J2RlJ5REJjSlczNEh1alJsTGRERm5yeTdkZFhOUWJvT0ZJbnNlenJHemM5NVAtakpkaWNmd2F6N2t5SFJOQThLT3pxVWxRclBzQTFpYWk4TFhta1ZLREJpUTVvemZrdlRYd2pJOWZjanZR0gF3QVVfeXFMT1NKRnM3QnZGUnlEQmNKVzM0SHVqUmxMZERGbnJ5N2RkWE5RYm9PRkluc2V6ckd6Yzk1UC1qSmRpY2Z3YXo3a3lIUk5BOEtPenFVbFFyUHNBMWlhaThMWG1rVktEQmlRNW96Zmt2VFh3akk5ZmNqdlE?oc=5) — 핀포인트뉴스 · 11/25 15:35
+- [엔데믹 그 후, 진단키트 투톱의 선택…씨젠·에스디바이오센서 주가 향방 가를 핵심 변수는?](https://news.google.com/rss/articles/CBMid0FVX3lxTFBNXzNwTllfcU53TU14WEZob2pBLVhQcWg0VmdwMklrUXFnZGZxU2xuaWEyVjZpV053azIxNFBpb0JkXzNSSXRVVlU3enp0RmpzQXVXcldoM0l0M2JLeFpsbkhuWkNLUzczYWJvWUZsOXF1aTY1Mmtn0gF3QVVfeXFMUE1fM3BOWV9xTndNTXhYRmhvakEtWFBxaDRWZ3AySWtRcWdkZnFTbG5pYTJWNmlXTndrMjE0UGlvQmRfM1JJdFVWVTd6enRGanNBdVdyV2gzSXQzYkt4WmxuSG5aQ0tTNzNhYm9ZRmw5cXVpNjUya2c?oc=5) — 핀포인트뉴스 · 11/25 14:00
+- [동절기 바이러스 확산 공포에 투심 쏠렸다…일동제약·강스템바이오텍 '점프'](https://news.google.com/rss/articles/CBMid0FVX3lxTE8yX3NJNVhDTnJIRm1jNTJKUGFvUldrTjZTOVZva0lJMk9xeDBqZ21FaVlyMDR1VC1PanpoTXRTVDFYejJQdktiOWw2ajMzdExaUzY0aWRQNmRDTlpOeXFZdktBT3NfT0k5WEpheDJoYnRyQVhOZ1JV0gF3QVVfeXFMTzJfc0k1WENOckhGbWM1MkpQYW9SV2tONlM5Vm9rSUkyT3F4MGpnbUVpWXIwNHVULU9qemhNdFNUMVh6MlB2S2I5bDZqMzN0TFpTNjRpZFA2ZENOWk55cVl2S0FPc19PSTlYSmF4MmhidHJBWE5nUlU?oc=5) — 핀포인트뉴스 · 11/25 11:34
+- [진단키트주 차익 매물에 약세…바이오니아는 실적 개선 기대에 상승랠리](https://news.google.com/rss/articles/CBMid0FVX3lxTE8zU25QdlZycU0zR1hGdXdPN2h0c1pYWmhQZzdPeTEyWWVtbVpBbE1aQ1RSSHhFc1NhNDJMRzJKbFlLR3hhcWthTkRsUGlpLTc3eWpodkRBdE5UVnV4Y0c5UmpYTnpDc05ONWViOFFxcXZ1a1Y2V3lJ0gF3QVVfeXFMTzNTblB2VnJxTTNHWEZ1d083aHRzWlhaaFBnN095MTJZZW1tWkFsTVpDVFJIeEVzU2E0MkxHMkpsWUtHeGFxa2FORGxQaWktNzd5amh2REF0TlRWdXhjRzlSalhOekNzTk41ZWI4UXFxdnVrVjZXeUk?oc=5) — 핀포인트뉴스 · 11/25 09:45
 - [[빅데이터로본다] 생물공학 상장기업 2026년 11월 브랜드평판... 1위 알테오젠, 2위 에이비엘바이오, 3위 펩트론](https://news.google.com/rss/articles/CBMia0FVX3lxTE5FVVMyOXBGRUNLX3JzQWQybmtHdUxMbjV4anFINDhDS0dmV1JPUWRFdlNtUHd6Q0w4MTY3YzVQeFpNazB6NVJRejZmXzJLRF9mZnNpYlJZdks4TWZZM1JGemFwOFlqZEV2S2cw?oc=5) — 일간투데이 · 11/25 07:03
 
 ## 바이러스 확산 (3건)
-- [타코마지역 양계장서 조류독감 발생…워싱턴주 올해 첫 상업농장 감염 > 시애틀 뉴스/핫이슈](https://news.google.com/rss/articles/CBMiSkFVX3lxTFB4TXA3RFVuWXRsZ2ZkSzVScmtPbkFydDF2RVBfSkR5dTBWUkMwaTJwLTRMay1ZcXRWQWhHcGVUaGRxN2tzdnBPS1N3?oc=5) — SeattleN · 11/25 06:52
-- [씽크풀 : 오늘의 마감 매매현황](https://news.google.com/rss/articles/CBMiaEFVX3lxTE1VY3lUalVTLWs1eUxaME5UUnA1eDdvUVl4Tmxvb0tzMEVmM0hLbTVyZ0hMSjUyRVZ0YXdWY1pDMFhrTVQ5Szk4QmNtME5jaEZtSG85YzNSMWNZT1lmZ3RPeDU3bVhOeWpq?oc=5) — ThinkPool · 11/24 09:31
-- [씽크풀 : 코미팜 700억원 수출 기반 확보 이익은 ?](https://news.google.com/rss/articles/CBMiaEFVX3lxTFBDNzVBbUdfSUx5TzF5d05YelItejBUTE9jQ29wc29vX1Q2Zk9MUml1TlZ5ZENRNXk0R0htN3d2WnQ4S01OeFdOSHRGdGJBXzg2ZEx5V3dhUVBCMTh2aGxINFhOVXhLOUlO?oc=5) — ThinkPool · 11/24 09:31
+- [겨울철 시설 수박, 해충 예방·생육 관리 철저 당부](https://news.google.com/rss/articles/CBMibkFVX3lxTE8tVnkydXpjaU5uWUJCMGVUNDhjUzRGUXZ2MGp4cE5ZRmdTRDk5ZWNVb09tTG9jTk5fUDZ1QnFZcVZ5VjJ4QWhQNW5lYldfV2VhY3JzYlA5Mjd1SEEteWdIdGN0bTlxdHF2Z2Zpel9R?oc=5) — 서프라이즈뉴스 · 11/25 16:13
+- [겨울철 노로바이러스 확산…갑작스러운 구토·설사 증상 주의](https://news.google.com/rss/articles/CBMibEFVX3lxTFBVVVFtR0IwTi1tOTNqT1J0aGxaUXd0VUY0UzNpVTBTVW1uRXZCMUZWd2JRLWhkUUN5NkNfUGNBSWdOZlZ3NGtKYTZ4NTBrZ283V1l3Sk1BS05mS1QyWFN5U0VFLVl5REJ2YktXbA?oc=5) — 메디컬투데이 · 11/25 08:36
+- [코로나19 대유행 당시 대학생이 바이러스 확산에 주요 역할](https://news.google.com/rss/articles/CBMibEFVX3lxTE85NUhVamNFNDBQQzNYUzI3blhKUl9yYXg2MDdsTF9SVnhtYXlOaWlSX1Nod2pRaDJ6blZZUG1hZHdSNVNNWlRLXzdjLUl3eDc3Q0U2bE5XXzc4OW9pempnS3ozVEN4dE9Mbnl1cA?oc=5) — 메디컬투데이 · 11/25 08:21
 
 ## 코로나 (3건)
-- [“오프라인도 AI 부정행위 뚫리는데”…기업 ‘온라인 채용 시험’ 비상](https://news.google.com/rss/articles/CBMiX0FVX3lxTE9xRTFLVlp4Zm9yRFl6RGpNS3cxZlFaYkNRWnVCREY0ZnNNb0o4aEtpTHg5dXowNk1MZTJhVVhvTzEtSUQ1VmdVencxSUdhd1hISEd6N0oxQzN4MFdOdHBj0gFfQVVfeXFMT3FFMUtWWnhmb3JEWXpEak1LdzFmUVpiQ1FadUJERjRmc01vSjhoS2lMeDl1ejA2TUxlMmFVWG9PMS1JRDVWZ1V6dzFJR2F3WEhIR3o3SjFDM3gwV050cGM?oc=5) — 경향신문 · 11/24 21:23
-- [사망자 36만명, 코로나 때 이어 역대 두 번째…패혈증은 10년 새 3배](https://news.google.com/rss/articles/CBMiVEFVX3lxTE5WRDdPZ20wbWVlVktDVmZqSzcwbUdJM1dVeWtWMFFEU0NzVUFxMmJaaXFNazNaMk9QdHBBUXgtZkNKdzEzYzdHU0lLaVd0N2pDUDlicw?oc=5) — :: 위즈경제 :: · 11/24 18:56
-- [새로운 코로나19 변이 바이러스가 출현함에 따라 보건부는 적극적인 질병 예방 조치를 권고합니다.](https://news.google.com/rss/articles/CBMinAFBVV95cUxOV0JPc29IVFluYVJDSldHX296TVNVbll0MXdWUHpYbHhleVVIZ0lxTVFYYmlzS0h5SndyNDlTMV9odzNvTzJzYjBpaDVOMjR2V3ZpVVQzQmFQRTdVV0MyTjhTeDBua3BHTW9uajRIcHFTdTU0ZkYwZ1BYMTJQeFBic0pERkZPdWlueW1uTFdEQzNTdUlMOVUyY3NHMVo?oc=5) — Vietnam.vn · 11/24 18:38
+- [美 추수감사절 방역 비상...8,150만 명 대이동](https://news.google.com/rss/articles/CBMiakFVX3lxTE5WbjhXMkU2LUNCTTMyYk5Fb3NLdmgxYlJrZXYyb19sU21KMkttdlhZNjQ5X2lpTkU0T2xneWxkZkNpaGtwRmVLWlk5OUVJbGk2a3UzV3JZRGVRRzdnOFN3Ri1fTnRuaGNTNkE?oc=5) — OBC 뉴스 · 11/25 23:09
+- [인플루엔자 71%·코로나19는 34%… 고령층 백신 격차 줄일 '예방접종관리법'의 숙제](https://news.google.com/rss/articles/CBMibEFVX3lxTE9HNW93RDk2YjhkZGgyd2RvVWFRNXFySXgwRUJYSDBUaTcwRlltSmlqSjk2U1Q2c2NrdW9ldmJJalhnTFMtaFAzclBfSUpKcVZHUkdXbUxUaHAwclpwcWY3Q2Z6NVplUE9vLVBPdg?oc=5) — 매경헬스 · 11/25 17:31
+- [독감·코로나 한 번에 맞으라는데…고령층 접종, 지역별 백신 수급이 관건](https://news.google.com/rss/articles/CBMib0FVX3lxTE9oYW1YUUhHRnZwUmxaSFpLaUdUdWtyV1dnaVpWNVVhc0dsR1gwUFRObXU5Q3RabG1kMTNVUzhFaElYZ2RpemZ3Tkg3UVk3SkFTUUs4bEJLUWFiS2dfbUNzd2t6T3BXTy1OOGNaQjhQWQ?oc=5) — 뉴스더보이스헬스케어 · 11/25 16:16
 
 ## 진단키트 (3건)
-- [세니젠, 모든 에볼라 바이러스 검출 PCR 신기술 개발 성공](https://news.google.com/rss/articles/CBMic0FVX3lxTE5QNGI2U1Rsd0NvREdOdmV4UWZZNnhfM29pRmZpVjZvWnBESXptaXdkVElkTDQ0TWJPZlpGNXlIMmFkc3hiVTlKRllISG9kSFdqbVJIUEVCMGdmU1NXa2lyRFM5NUpuSVZ5bjh1TVJ1dEFOamM?oc=5) — 전남인터넷신문 · 11/25 08:47
-- [수젠텍, 현장진단 장비 광학기술 미국 특허 등록](https://news.google.com/rss/articles/CBMia0FVX3lxTFBxUEpiS1Q4Ymt6UzdaUzRfR0lqa3FBTDhWUU9OWmtJZDRXV2RkYXZPalFHNHVLaV9hVlRNNUx5TG9BS196a19sWlpOTWcyeWI4d240el9vXy1rRG5XWVk0QXR4QktfZ1VtT284?oc=5) — 히트뉴스 · 11/25 08:31
-- [헬리코박터 맞춤치료, 배양검사가 PCR보다 제균율↑·항생제 노출↓](https://news.google.com/rss/articles/CBMia0FVX3lxTE4tczN6dlUxT0hsZzB4OVB2Y3paY3gtWDNKdjNDcFJhWk81MlJTQlFEX1JCQk1WTmpsdzRZbU1NNHkxenhtWFdPUGZFZ0k5bXZHdlZ1MzV4NjhDNUh6b0ZPNkhsdjdzNFlRTVZv?oc=5) — 메디칼업저버 · 11/25 06:01
+- [셀세이프, 인도 바이오기업에 진단키트 공급 추진](https://news.google.com/rss/articles/CBMiWkFVX3lxTFBGRk8tZjdoa1hHdExZdmhZVlNUZFBSNWh3UENUU2NrZDM0NHNlM2JtOFBWalZYcW5uN2gwZzVsSnpaV0dYbGh5Yzgxb19KdlFWQnpnbUptUDBWdw?oc=5) — 파이낸셜뉴스 · 11/26 08:04
+- [셀세이프, 인도 Syngene과 품질검사 키트 공급 협약](https://news.google.com/rss/articles/CBMiZEFVX3lxTE1wZjVJYlJWOGdfclZkajF0REZyNnIxVmgyU2l5R0dWb1NBSS1tX0hfUWRyQU9aODZrTlZaRGkya0V3eWh4THJZWHJ0eDNrUW5oUzU0VkpyTTVITzFqQk13Ry11a3I?oc=5) — 메디포뉴스 · 11/26 06:03
+- [2035년 정량 PCR 분석 키트 시장: 바이오공정 품질관리와 세포·유전자 치료제 출하 검사가 성장 견인](https://news.google.com/rss/articles/CBMi_AFBVV95cUxNXzJjT3MwYkRaT0h3RmVydDdFdGZiU3V6cEh0ckpmeVVSdUtQQV82enBZakVnZ1JjX0xleC1sNWo3bGhKeUlyNWFmSXVORjR2cjd5bHpPcWpBMnRxdXhSeUtGU2ZPWGw2amxlb0o4VUtzV0RsNzVjOGlnajY4U2RyNG1QdW5DeUF3OFZXY09RUXJOdVZSbjI3VjVVUEF0LW1LM3Z4NVM5N0VRRHFUYkxGV3B0YjQ5TTkxTi1yYkVwb3JDVmF5OVYtNVB2OTl6V3ZDMHNtbkMyQThUdGhQQWlTTG1lanowd25SWUV5dGFIc1VTVGpYbjBCN3VwNTA?oc=5) — IndexBox · 11/25 23:41
 
-## 지카바이러스 (3건)
-- ['볼바키아 감염 모기' 방사했더니 뎅기열 등 감염 69% 감소](https://news.google.com/rss/articles/CBMibEFVX3lxTE1ibEtBUTFHbEZlOTJKYmU0VlpCUnB6ajRYUmJKdVMxSzhpd3Z3NG1waWZzakViS1o5RGVVQW5hajhfdS1yZmVBSURFT3hya2xJYllYTkE4NUk1U2ZuN1cxOFdrYU0zdUZvVDJyVw?oc=5) — 메디컬투데이 · 11/24 14:01
-- [남성 바이러스 감염, 왜 더 심할까… 면역반응 성별 차이 확인](https://news.google.com/rss/articles/CBMiQ0FVX3lxTE8zaUJrZG9UMWljemJGYlRQaHQ4UGx2WjF2REItQjYxWDJRX2VQS3lkQ1llSG5TbzVET3M3THFPZzBsUEU?oc=5) — 한국공공정책신문 · 11/24 09:46
-- [남자가 엄살?…“감기 걸렸을때 여자보다 더 아플 수 있다”](https://news.google.com/rss/articles/CBMiWkFVX3lxTE16dFB0MXVaeHFPa3VoQm5WZklSSk00NGF0YkJEVHo4NE9DazJjM0YtYmRTY3RUZTBuNnJ5VFczZmJkMGVwaXlUeE5QRExiMm9XUWVQUlpvZjEyZw?oc=5) — 농민신문 · 11/24 07:01
+## 지카바이러스 (0건)
+- 최근 기사 없음
 
-## 엠폭스 (2건)
-- [질병청, 제4급 법정 감염병 '칸디다 오리스 감염증' 격리실 급여 적용](https://news.google.com/rss/articles/CBMib0FVX3lxTFAwNU1ndnRJRktYVHRZa1JyMzl2Nnp5ZUhnMTh5NVhqT3FDdks5T2EyemgxdjBHaDJzWm5oRjJfZmRaUHZaLTJyQzNkbFd1UEtWWFZreTc2S3I4cWlpMkpETzRRWWQ3eVJhdnBCRHR2OA?oc=5) — 뉴스더보이스헬스케어 · 11/25 06:04
-- [DNA 잠근 채 세포 장악…폭스바이러스 '사령부' 3D 포착](https://news.google.com/rss/articles/CBMia0FVX3lxTE94MlJqMmRPUjZTWUwxUlNVTVV6VC1sSTc5VmRTOC1tV1FwQnY4N1JNSTAxTnRqblJOZHM4RmtKZ1c4cWxYSEFHby00R19OTG1RM0V1NmVCbGo3a1JiVU95elRmVEhSeHVVZHRB0gFrQVVfeXFMT3gyUmoyZE9SNlNZTDFSU1VNVXpULWxJNzlWZFM4LW1XUXBCdjg3Uk1JMDFOdGpuUk5kczhGa0pnVzhxbFhIQUdvLTRHX05MbVEzRXU2ZUJsajdrUmJVT3l6VGZUSFJ4dVVkdEE?oc=5) — 경제투데이 · 11/24 10:50
+## 엠폭스 (3건)
+- [확산하는 ‘원숭이두창’…정부 "천연두백신 3500만명분 비축"](https://news.google.com/rss/articles/CBMiVEFVX3lxTE9ZOWgycnFWLUNxZEFVWkpIdUpNeXd5V2MxUDlPVW9aYXB5Tjc2bm5fejQxVEdHM200X0ZqSVJvUnl2MUFvY01kNkFYUjJRSlYwZXRZeg?oc=5) — JTBC · 11/26 01:00
+- [하노이시는 연말 질병 발생 위험을 선제적으로 예방하고 있습니다.](https://news.google.com/rss/articles/CBMihAFBVV95cUxPOFhUZEwxVVllQldYT0syLVY2c0J6SXoxUHl3Q2k2Tkc4eWpEc3VFVzVXWTF1ZEp0XzhIRlAwY1pKVDd4TWhpQzdFVV9RMlc2cGZjSkxEaW1wM0NiT1JKd3ZXYm9pUHU4Vm9ENzdraGQ3LVR5RG41TGV4Q3JYVHNVay0tSnk?oc=5) — Vietnam.vn · 11/25 17:16
+- [하노이시는 원숭이두창 예방 및 통제 조치를 적극적으로 강화하고 있습니다.](https://news.google.com/rss/articles/CBMimwFBVV95cUxQMlNHbHl1QTNDLVMwakMwOEFIWVhvcWZjZ1FNeEFNcFFNUDFWalJYcEJSVDNQbWxmLTg5aVZ1ejVkRFU5QlN4bHdSRDdBU1VvZFl4cTA3eEVIRjB1WThxVlk1YVZRNUFWR19BcjJfQUNYU0NoLXJ1UUZCcERPNFFrbndqNENPWS1TeVMtZHZvVF9TdmVDQUJieE5LOA?oc=5) — Vietnam.vn · 11/25 12:54
 
 ## 감염병 (3건)
-- [국립중앙의료원, 이건희 유족 기부금 7000억원으로 감염병 진료·연구망 구축](https://news.google.com/rss/articles/CBMidEFVX3lxTE54QmZTc19Ia0FBOFdjZEVaN0VWNWdsNm1EWHMwUEZNeXVvVFBsX3JvR0JVT3JQZDVfQmhuNkx3dHM4MkVfOXowMTExZjFsMmliTXJVamkwZ0VfWXh3WW5TajcyOWhuaFFBLXhqYkl2TmNnNzc4?oc=5) — 파이낸셜포스트 · 11/25 08:36
-- [반려견 생명 위협하는 감염병 '4가지', 예방은?](https://news.google.com/rss/articles/CBMieEFVX3lxTFB2UmRxRlFDcjVYY3FWVEtldEV2N29kVFM5a05hbDBhNnJKci1zRGw5LUxXZ3ZRakphWWVkN1ZnOE1QbEdlRndZelIyNzFrbVZtU3VtMTZiVG1pSnk3dzMtSE9Jbi1SV0tYUlRjRzFfR3gydmt2MFlnSA?oc=5) — 스포츠조선 · 11/25 08:10
-- [이건희 유산 5000억으로, ‘중앙감염병원’ 내년 착공](https://news.google.com/rss/articles/CBMiZkFVX3lxTFBPRDVyVmI4aFlGZ1c1WGtDOV9hVVJBZENOMlhVa2xGUjNxMmw4djRCREpzN3R6MF9zUEcyWGRucmZvQnItTmxocjRhQ1Z6YTJISVR4SEhfQjBieUFfb0hKQkJGZWttd9IBZkFVX3lxTFBPRDVyVmI4aFlGZ1c1WGtDOV9hVVJBZENOMlhVa2xGUjNxMmw4djRCREpzN3R6MF9zUEcyWGRucmZvQnItTmxocjRhQ1Z6YTJISVR4SEhfQjBieUFfb0hKQkJGZWttdw?oc=5) — 동아일보 · 11/25 04:30
+- [이건희가 남긴 5000억으로... ‘중앙감염병병원’ 내년 첫 삽](https://news.google.com/rss/articles/CBMijwFBVV95cUxOMTFFNndWSDBCNG9CdzNHY2xENVNKck4zdXV4aEFGWDVDQnJxME1wZ1VvQUJKbmljMFdBMktDcjcyX0V0UmVjU1U2TTdHWEZJNWE0c1c0dTBVclpteVBDX2xtLXR3RGZBY0tOcmRQbkxvMGRvS2FzbGZqUlVGN1NGLVNwaG1XeWFIaDBvTmktRQ?oc=5) — 조선일보 · 11/26 07:16
+- [[행감] 정은수 의원 “감염 취약시설 관리 예산·인력 확충해야”](https://news.google.com/rss/articles/CBMiZ0FVX3lxTE0wMHFMNW9UWDNKaXJUTG1SdDR3Tjg5TThoRE8zQ0l6THpsVVU3QmV1d3hKTGJkR3NXdjFoaTMtX2R6SGdOeWNkRVFINzlVRk5fbnlOemYyeThRTkN0ejN1cWVvUWphX0U?oc=5) — 시흥저널 · 11/26 07:02
+- [잘못된 항생제 복용 습관, ‘감염병 치료의 미래’ 무너뜨린다 [건강한겨레]](https://news.google.com/rss/articles/CBMia0FVX3lxTE9sQTAtZUVvUndrOHMxbDBLVFJ5VDNLMjlNTmFpS05rYnl2M0N2YzNFSS1ZMlFleVlvOHVtNWtNbW4zdFV1aGpSejhIbUhlaHY1WkpiQ2dRN2JSWmFCSXhDZVhhUkhhSFdvdk9j?oc=5) — 한겨레 · 11/26 05:00
 
 최근 30시간 구글 뉴스 검색 결과입니다. 투자 권유가 아닙니다.
